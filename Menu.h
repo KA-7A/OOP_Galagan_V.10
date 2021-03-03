@@ -21,12 +21,12 @@ public:
             switch (choice){
                 case 1:
                 {
-                    drawStations();
+                    drawStations(0);
                     break;
                 }
                 case 3:
                 {
-                    int lineNum = drawStations();
+                    int lineNum = drawStations(1);
                     std::cout << " Which stations are you interested in? Type it's numbers \n >>" ;
                     int n1, n2;
                     std::cin >> n1 >> n2;
@@ -36,7 +36,8 @@ public:
                     {
                         double minTime = Lines[lineNum].calculateTravelTime_min(n1, n2);
                         double maxTime = Lines[lineNum].calculateTravelTime_max(n1, n2);
-                        std::cout << "min time: " << minTime << " || max time: " << maxTime << std::endl;
+                        if (!(minTime == -1 || maxTime == -1))
+                            std::cout << "min time: " << minTime << " || max time: " << maxTime << std::endl;
                     }
                     break;
                 }
@@ -48,11 +49,9 @@ public:
                 default:
                     continue;
             }
-
-
         }
     }
-    int drawStations() const {
+    int drawStations(int mode) const {
         int ans = -2;
         while (ans == -2) {
             std::cout << " ## Which line are you interested in? ##" << std::endl;
@@ -63,7 +62,10 @@ public:
             if (ans == -1)
                 return -1;
             if (ans >= 0 && ans < Lines.size()) {
-                Lines[ans].printAllStationsInfo_list();
+                if (!mode)
+                    Lines[ans].printFullAllStationsInfo_list();
+                else
+                    Lines[ans].printShortAllStationsInfo_list();
                 return ans;
             }
             else {
@@ -81,7 +83,6 @@ public:
         std::cout << " *                                *" << std::endl;
         std::cout << " * 0. Exit                        *" << std::endl;
         std::cout << " **********************************" << std::endl << " >> ";}
-
 };
 
 

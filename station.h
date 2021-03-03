@@ -12,12 +12,12 @@
 
 class Station{
 private:
-    int m_number;           // Номер станции, имеет вид (№ветки * 1000 + №станции)
-    int m_av_traffic;       // Значение среднего траффика
-    std::string m_name;     // Имя станции
-    Station *m_next, *m_prev;   // Указатели на соседние станции. Ну потому что по ТЗ это д.б. связанный список
-    Span m_left, m_right; // Указатели на перегоны до соседних станций. Если соседний перегон занимает 0 времени, то станция конечная (оч кривая система, но пусть будет)
-    bool m_isRegular;       // true -- станция обычная, false -- пересадочная. Мне не нрав такой момент, но пусть будет
+    int m_number;               // Номер станции, имеет вид (№ветки * 1000 + №станции)
+    int m_av_traffic;           // Значение среднего траффика
+    std::string m_name;         // Имя станции
+    Station *m_next, *m_prev;   // Указатели на соседние станции. Ну потому что по ТЗ это д.б. связанный список. Если что-то нулл, то это конечная
+    Span m_left, m_right;       // Указатели на перегоны до соседних станций.
+    bool m_isRegular;           // true -- станция обычная, false -- пересадочная. Мне не нрав такой момент, но пусть будет
 public:
     Station(void)
     {
@@ -45,38 +45,47 @@ public:
     }
 
     // ## Соединяем станции ## //
-    inline void rightConnect(Station *next, Span &right ) { m_next = next ; m_right = right;
-    //std::cout << "St." << m_name << "and st." << m_next->getName() << " connected" << std::endl;
-    }    // Соединяем станциями справа
-    inline void leftConnect (Station *prev,  Span &left)  { m_prev = prev ; m_left  = left;
-    //std::cout << "St." << m_name << "and st." << m_prev->getName() << " connected" << std::endl;
-    }    // И слева
+    inline void rightConnect(Station *next, Span &right ) { m_next = next ; m_right = right; }
+    inline void leftConnect (Station *prev, Span &left)   { m_prev = prev ; m_left  = left;  }
 
     // ## Меняем кое-какие показатели ## //
-    inline void changeToType(bool type){ m_isRegular = type; }
-    inline void TrafficChange(int new_traffic) { m_av_traffic = new_traffic; };
-    inline void ChangeTypeToCrossing() { m_isRegular = false; } // Не спрашивай, почему оно вот так
+    inline void changeToType (bool type)        { m_isRegular = type;         }
+    inline void TrafficChange(int new_traffic)  { m_av_traffic = new_traffic; }
+    inline void ChangeTypeToCrossing()          { m_isRegular = false; }    // Не спрашивай, почему оно вот так
 
     // ## Выдаем всю информацию о станции на печать ## //
-    void printInfo() const {
+    void printFullInfo()  const {
+        std::cout << "_________________________" << std::endl;
+        std::cout << "| name: " << m_name             << std::endl <<
+                     "| num: "  << m_number           << std::endl <<
+                     "| av_traffic: " << m_av_traffic << std::endl;
+        if (m_isRegular)
+        std::cout << "| Type: regular" << std::endl;
+        else
+        std::cout << "| Type: crossing" << std::endl;
+        std::cout << "| neighbours: "   << std::endl;
+        if (getLeftAddr() ) std::cout << "| l:" << getLeftName()  << std::endl;
+        if (getRightAddr()) std::cout << "| r:" << getRightName() << std::endl;
+        std::cout  << "|________________________"  << std::endl;
+    }
+    void printShortInfo() const {
         std::cout << "\n-----------------------" << std::endl;
-        std::cout << "name: " << m_name << "\nnum: " << m_number << "\nav_traffic: " << m_av_traffic << std::endl;
-        if (m_isRegular) std::cout << "Type: regular" << std::endl;
-        else std::cout << "Type: crossing" << std::endl;
+        std::cout << "name: " << m_name << std::endl <<
+                     "num : " << m_number << std::endl;
         std::cout << "-----------------------" << std::endl;
     }
 
 // #### Получаем информацию о самой станции #### //
-    inline int  getNumber() const { return m_number; };
-    inline int  getTraffic()const { return m_av_traffic; };
-    inline std::string getName()  { return m_name;  };
-    inline bool isCrossing() const{ return (!m_isRegular); }
+    inline int  getNumber()  const { return m_number;       }
+    inline int  getTraffic() const { return m_av_traffic;   }
+    inline std::string getName()   { return m_name;         }
+    inline bool isCrossing() const { return (!m_isRegular); }
 
 // #### Получаем информацию о соседях станции ### //
-    inline std::string getLeftName() const { return m_prev->getName(); }
-    inline std::string getRightName() const{ return m_next->getName(); }
-    inline Station * getLeftAddr()  const { return m_prev; }
-    inline Station * getRightAddr() const { return m_next;}
+    inline std::string getLeftName()  const { return m_prev->getName(); }
+    inline std::string getRightName() const { return m_next->getName(); }
+    inline Station * getLeftAddr()    const { return m_prev; }
+    inline Station * getRightAddr()   const { return m_next; }
 // И перегонах
     inline Span getLeftSpan()  const { return m_left;  }
     inline Span getRightSpan() const { return m_right; }

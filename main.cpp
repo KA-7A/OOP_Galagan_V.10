@@ -63,9 +63,10 @@ std::vector<Line> getLines(const char *filename, std::vector<Line> Lines)  // Э
             assert(Sp.IsObject()                                                                // Проверяем, что это у нас объект
             && Sp.HasMember("left")  && Sp["left"].IsString()                                   // Что в нем есть строковое поле "left"
             && Sp.HasMember("right") && Sp["right"].IsString()                                  // Что в нём есть строковое поле "right"
-            && Sp.HasMember("time")  && (Sp["time"].IsDouble() || Sp["time"].IsInt()) && Sp["time"].GetDouble() >= 0    // Что там есть поле время с неотрицательным значением
+            && Sp.HasMember("min_time")  && (Sp["min_time"].IsDouble() || Sp["min_time"].IsInt()) && Sp["min_time"].GetDouble() >= 0    // Что там есть поле время с неотрицательным значением
+            && Sp.HasMember("max_time")  && (Sp["max_time"].IsDouble() || Sp["max_time"].IsInt()) && Sp["max_time"].GetDouble() >= 0
             );
-            Span tmpSpan(Sp["left"].GetString(), Sp["right"].GetString(), Sp["time"].GetDouble());
+            Span tmpSpan(Sp["left"].GetString(), Sp["right"].GetString(), Sp["min_time"].GetDouble(), Sp["max_time"].GetDouble());
             tmpLine.spanPushBack(tmpSpan);
         }
 // ---------- Here is Lines filling and connection block -- //
@@ -118,8 +119,6 @@ std::vector<Line> getLines(const char *filename, std::vector<Line> Lines)  // Э
                 tmpLine.addStationToLine(tmpStation);       // Тут добавляем станцию в вектор
                 // tmpStation.printInfo();
             }
-
-
         }
 
         Lines.push_back(tmpLine);

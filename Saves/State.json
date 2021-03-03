@@ -24,17 +24,20 @@
             {
                 "left": "Moskva Kievskaya",
                 "right": "Moskva Kievskaya",
-                "time": 0
+                "min_time": 0,
+                "max_time": 0
             },
             {
                 "left": "Moskva Kievskaya",
                 "right": "Moskva Sortirovochnaya",
-                "time": 3
+                "min_time": 3,
+                "max_time": 4
             },
             {
                 "left": "Moskva Sortirovochnaya",
                 "right": "Moskva Sortirovochnaya",
-                "time": 0
+                "min_time": 0,
+                "max_time": 0
             }
         ]
     },
@@ -46,6 +49,14 @@
                 "neighbours": ["Moskva Savelovskaya", "Timiryazevskaya"],
                 "is_crossing": true,
                 "cross_to": ["Moscow Metro"],
+                "traffic": 100
+            },
+            {
+                "name": "Degunino",
+                "number": 3,
+                "neighbours": ["Moskva Savelovskaya", "Beskudnikovo"],
+                "is_crossing": false,
+                "cross_to": [],
                 "traffic": 100
             },
             {
@@ -65,14 +76,6 @@
                 "traffic": 100
             },
             {
-                "name": "Degunino",
-                "number": 3,
-                "neighbours": ["Moskva Savelovskaya", "Beskudnikovo"],
-                "is_crossing": false,
-                "cross_to": [],
-                "traffic": 100
-            },
-            {
                 "name": "Beskudnikovo",
                 "number": 4,
                 "neighbours": ["Degunino", "Beskudnikovo"],
@@ -86,32 +89,38 @@
             {
                 "left": "Moskva Savelovskaya",
                 "right": "Moskva Savelovskaya",
-                "time": 0
+                "min_time": 0,
+                "max_time": 0
             },
             {
                 "left": "Moskva Savelovskaya",
                 "right": "Timiryazevskaya",
-                "time": 3
+                "min_time": 3,
+                "max_time": 5
             },
             {
                 "left": "Timiryazevskaya",
                 "right": "Okruzhnaya",
-                "time": 3
+                "min_time": 3,
+                "max_time": 4
             },
             {
                 "left": "Okruzhnaya",
                 "right": "Degunino",
-                "time": 3
+                "min_time": 3,
+                "max_time": 5
             },
             {
                 "left": "Degunino",
                 "right": "Beskudnikovo",
-                "time": 3
+                "min_time": 3,
+                "max_time": 6
             },
             {
                 "left": "Beskudnikovo",
                 "right": "Beskudnikovo",
-                "time": 0
+                "min_time": 0,
+                "max_time": 0
             }
         ]
     }

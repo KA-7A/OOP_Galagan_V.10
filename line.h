@@ -36,37 +36,53 @@ private:
     std::vector<Span> m_spansList;  // Сделаем такую вот штуку, чтобы гарантированно сохранить все перегоны (чтобы ничто нигде не затерлось)
     Station *m_head, *m_tail;        // Указатели на начало и конец ветки..
     std::string m_name;
+
+    void sortLine() {   // Этот метод в private, потому что если отсортировать вектор, а потом не связать всё заново, то ничего не будет работать
+        for (int i = 0; i < m_line.size()-1; i++)
+        {
+            int min_index = i;
+            for (int j = i+1; j < m_line.size(); j++)
+                if (m_line[j]<m_line[min_index])
+                    min_index = j;
+            if (min_index != i) {
+                Station tmp;
+                tmp = m_line[i];
+                m_line[i] = m_line[min_index];
+                m_line[min_index] = tmp;
+            }
+        }
+    }
 public:
     Line() {
         m_head = m_tail = nullptr;
     }
 // ## Под замену ## //
-    inline void addStationToLine(const Station& S) { m_line.push_back(S); }
+    inline void addStationToLine(const Station& S)        { m_line.push_back(S); }
     inline void addStationToLine(const CrossingStation& S){ m_line.push_back(S); }
+// ## Меняем кое-что внутри нашей ветки
     inline void writeName(std::string name) { m_name = std::move(name); }
     inline void spanPushBack(const Span& s) { m_spansList.push_back(s); }
+// ## Получаем на выход информацию о станции
     std::string getName() const{ return m_name; }
-
-    void printAllStationsInfo() const {
-        std::cout << "##### Line " << m_name << " #####" << std::endl;
-        for (const auto & i : m_line) {
-            i.printInfo();
-            if (i.isCrossing())
-                std::cout << "Crossing station, yess" << std::endl;
-                //m_line[i].printCrossStations();
-        }
-    }
-    void printAllStationsInfo_list() const{
+    void printFullAllStationsInfo_list()  const{
         Station *head = m_head, *tail = m_tail;
-        while (head!=tail)
+        while (head != nullptr)
         {
-            head ->printInfo();
+            head ->printFullInfo();
             head = head->getRightAddr();
         }
-        tail->printInfo();
+    }
+    void printShortAllStationsInfo_list() const{
+        Station *head = m_head, *tail = m_tail;
+        while (head != nullptr)
+        {
+            head ->printShortInfo();
+            head = head->getRightAddr();
+        }
     }
 
     void connectLine() {
+        sortLine();
         std::vector<Span> Sp = m_spansList;
         std::vector<Station> St = m_line;
         for (long unsigned int i = 0; i < St.size(); i++)
@@ -108,16 +124,15 @@ public:
                 break;
             }
         //printLine();
+        assert(checkLine() == 2);
     }
-    void printLine() const {
-        std::cout << "##################################" << std::endl;
-        Station * cur = m_head;
-        while(cur != nullptr )
-        {
-            cur->printInfo();
-            cur = cur ->getRightAddr();
-        }
-        std::cout << "##################################" << std::endl;
+
+    int checkLine() const {
+        int counter = 0;
+        for (int i = 0; i < m_line.size(); i++)
+            if (m_line[i].getRightAddr() == nullptr || m_line[i].getLeftAddr() == nullptr)
+                counter++;
+        return counter;
     }
 
     double calculateTravelTime_min (int n1, int n2) const {
@@ -125,25 +140,38 @@ public:
          * Тут получаем на вход номера станций и считаем расстояние между ними :)
          */
         Station *head = m_head, *tail = m_tail;
-        while (head->getNumber() != n1 && head->getNumber() != n2)
+        while (head != nullptr && head->getNumber() != n1 && head->getNumber() != n2)
             head = head->getRightAddr();
+        if (head == nullptr)
+            {
+                std::cout << "Station with that number did not found!" << std::endl;
+                return -1;
+            }
         double time_min = 0;
         if (head->getNumber() == n1 )
         {
             tail = head;
-            while (tail->getNumber() != n2 && tail != nullptr ){
+            while (tail != nullptr && tail->getNumber() != n2 ){
                 time_min += tail->getRightSpan().getTime_min();
                 tail = tail->getRightAddr();
-
             }
-
+            if (tail == nullptr)
+            {
+                std::cout << "Station with that number did not found!" << std::endl;
+                return -1;
+            }
         }
         else
         {
             tail = head;
-            while (tail->getNumber() != n1 && tail != nullptr) {
+            while (tail != nullptr && tail->getNumber() != n1) {
                 time_min += tail->getRightSpan().getTime_min();
                 tail = tail->getRightAddr();
+            }
+            if (tail == nullptr)
+            {
+                std::cout << "Station with that number did not found!" << std::endl;
+                return -1;
             }
         }
         return time_min;
@@ -151,29 +179,41 @@ public:
     }
     double calculateTravelTime_max (int n1, int n2) const {
         Station *head = m_head, *tail = m_tail;
-        while (head->getNumber() != n1 && head->getNumber() != n2)
+        while (head != nullptr && head->getNumber() != n1 && head->getNumber() != n2)
             head = head->getRightAddr();
+        if (head == nullptr)
+        {
+            std::cout << "Station with that number did not found!" << std::endl;
+            return -1;
+        }
         double time_max = 0;
         if (head->getNumber() == n1)
         {
             tail = head;
-            while (tail->getNumber() != n2){
+            while (tail != nullptr && tail->getNumber() != n2 ){
                 time_max += tail->getRightSpan().getTime_max();
                 tail = tail->getRightAddr();
-
             }
-
+            if (tail == nullptr)
+            {
+                std::cout << "Station with that number did not found!" << std::endl;
+                return -1;
+            }
         }
         else
         {
             tail = head;
-            while (tail->getNumber() != n1) {
+            while (tail != nullptr && tail->getNumber() != n1) {
                 time_max += tail->getRightSpan().getTime_max();
                 tail = tail->getRightAddr();
             }
+            if (tail == nullptr)
+            {
+                std::cout << "Station with that number did not found!" << std::endl;
+                return -1;
+            }
         }
         return time_max;
-
     }
 
 };

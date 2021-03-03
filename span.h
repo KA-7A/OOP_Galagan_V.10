@@ -15,11 +15,10 @@ private:
     double m_minTime, m_maxTime;
 public:
     Span() {
-        m_minTime = 0.9;
-        m_maxTime = 1.1;
+        m_minTime = m_maxTime = 0;
     }
-    Span(std::string &S1, std::string &S2, double minTime, double maxTime) // Передали по ссылке, теперь можем их менять как вздумается
-    {
+    Span(const char* S1, const char* S2, double minTime, double maxTime){ // Передали по ссылке, теперь можем их менять как вздумается
+
         if (minTime > maxTime) {
             std::cout << "Incorrect input: minTime > maxTime! I'll swap it" << std::endl;
             m_minTime = maxTime;
@@ -31,9 +30,9 @@ public:
         m_left_st = S1;
         m_right_st = S2;
     }
-    Span(const char* S1, const char * S2, double time) // Передали по ссылке, теперь можем их менять как вздумается
+    Span(const char* S1, const char* S2, double time)
     {
-        if (!time) {
+        if (time == 0) {
             m_maxTime = m_minTime = 0;
         }
         else
@@ -44,10 +43,15 @@ public:
         m_left_st = S1;
         m_right_st = S2;
     }
-    inline std::string getLeft() { return m_left_st; }
-    inline std::string getRight() { return m_right_st; }
-    inline double getTime_min() { return m_minTime; }
-    inline double getTime_max() { return m_maxTime; }
+// ## Получем имена соседних станций
+    inline std::string getLeft()  const { return m_left_st; }
+    inline std::string getRight() const { return m_right_st; }
+// ## Получаем время, за которое можно пересечь этот перегон
+    inline double getTime_min() const   { return m_minTime; }
+    inline double getTime_max() const   { return m_maxTime; }
+// ## Меняем время перегона. Больше ничего менять не планируется
+    inline void setTime_min(double min) { m_minTime = min; }
+    inline void setTime_max(double max) { m_maxTime = max; }
 };
 
 
