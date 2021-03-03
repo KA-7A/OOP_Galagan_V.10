@@ -46,6 +46,8 @@ public:
     }
     inline std::string getLeft() { return m_left_st; }
     inline std::string getRight() { return m_right_st; }
+    inline double getTime_min() { return m_minTime; }
+    inline double getTime_max() { return m_maxTime; }
 };
 
 

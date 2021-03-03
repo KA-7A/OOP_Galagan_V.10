@@ -63,7 +63,7 @@ public:
         std::cout << "name: " << m_name << "\nnum: " << m_number << "\nav_traffic: " << m_av_traffic << std::endl;
         if (m_isRegular) std::cout << "Type: regular" << std::endl;
         else std::cout << "Type: crossing" << std::endl;
-        std::cout << "-----------------------\n" << std::endl;
+        std::cout << "-----------------------" << std::endl;
     }
 
 // #### Получаем информацию о самой станции #### //
@@ -77,6 +77,9 @@ public:
     inline std::string getRightName() const{ return m_next->getName(); }
     inline Station * getLeftAddr()  const { return m_prev; }
     inline Station * getRightAddr() const { return m_next;}
+// И перегонах
+    inline Span getLeftSpan()  const { return m_left;  }
+    inline Span getRightSpan() const { return m_right; }
 // #### Перегружаем операторы ##### //
     bool operator== (const Station &S2) const { return (m_number == S2.m_number); }
     bool operator<  (const Station &S2) const { return (m_number < S2.m_number);  }

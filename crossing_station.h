@@ -41,7 +41,7 @@ class CrossingStation :public Station {
         inline void printCrossStations() const {
             std::cout << "Cross to: \n";
             for (long unsigned int i = 0; i < m_CrossList.size(); std::cout << "--\"" << m_CrossList[i] << "\"" << std::endl, i++);
-            std::cout << "-------------------\n" << std::endl;
+            std::cout << "-------------------" << std::endl;
         }
 };
 

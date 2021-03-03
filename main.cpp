@@ -4,6 +4,7 @@
 #include "line.h"
 #include "span.h"
 #include "crossing_station.h"
+#include "Menu.h"
 
 
 std::vector<Line> getLines(const char *filename, std::vector<Line> Lines)  // Эта функция будет доставать из файла информацию о линии. Надо запилить еще миллион проверок
@@ -120,18 +121,21 @@ std::vector<Line> getLines(const char *filename, std::vector<Line> Lines)  // Э
 
 
         }
-        tmpLine.connectLine();
+
         Lines.push_back(tmpLine);
+        Lines[i].connectLine();
+        std::cout << "Data was added" << std::endl;
     }
     return Lines;
 }
 
+void menu(std::vector<Line> Lines) {
+    Menu Menu(Lines);
+}
+
 int main() {
     std::vector<Line> Lines = {};
-    Lines = getLines("/home/ka_7a/Desktop/MIPT/OOP_2/Saves/State.json", Lines);  // Возможно можно обойтись 1 переменной, мб - двумя. Просто хз как работает вектор
-    /*
-    for (int i = 0; i < Lines.size(); i++)
-        Lines[i].printAllStationsInfo();
-        */
+    Menu Menu(getLines("/home/ka_7a/Desktop/MIPT/OOP_2/Saves/State.json", Lines));  // Возможно можно обойтись 1 переменной, мб - двумя. Просто хз как работает вектор
+    menu(Lines);
     return 0;
 }

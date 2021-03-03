@@ -55,7 +55,15 @@ public:
                 std::cout << "Crossing station, yess" << std::endl;
                 //m_line[i].printCrossStations();
         }
-
+    }
+    void printAllStationsInfo_list() const{
+        Station *head = m_head, *tail = m_tail;
+        while (head!=tail)
+        {
+            head ->printInfo();
+            head = head->getRightAddr();
+        }
+        tail->printInfo();
     }
 
     void connectLine() {
@@ -65,54 +73,107 @@ public:
         {
             Station curSt = St[i];
             std::string st_name = curSt.getName();
-            for (auto & j : Sp) {
-                Span curSp = j;
+            for (int j = 0; j < Sp.size(); j++) {
+                Span curSp = Sp[j];
                 std::string left = curSp.getLeft(), right = curSp.getRight();
-                if (left == st_name)
+                if (left == st_name && left!=right)
                     for (long unsigned int k = 0; k < St.size(); k++)
                         if (St[k].getName() == right)
                         {
-                            St[i].rightConnect(&St[k], j);
+                            m_line[i].rightConnect(&m_line[k],m_spansList[j]);
                             //std::cout <<  st_name << " -> " << right  << std::endl;
                             break;
                         }
 
-                if (right == st_name)
+                if (right == st_name && left!=right)
                     for (long unsigned int k = 0; k < St.size(); k++)
                         if (St[k].getName() == left)
                         {
-                            St[i].leftConnect(&St[k], j);
+                            m_line[i].leftConnect(&m_line[k],m_spansList[j]);
                             //std::cout << left << " <- " << st_name << std::endl;
                             break;
                         }
             }
         }
-        m_line = St;
-        m_spansList = Sp;
-        for (auto & i : m_line)
-            if (i.getLeftName() == i.getName()) // Гарантированно получаем левый конец ветки
+        for (int i = 0; i < m_line.size(); i++)
+            if (m_line[i].getLeftAddr() == nullptr) // Гарантированно получаем левый конец ветки
             {
-                m_head = &i;
+                m_head = &m_line[i];
                 break;
             }
-        for (auto & i : m_line)
-            if (i.getRightName() == i.getName()) // Гарантированно получаем правый конец ветки
+        for (int i = 0; i < m_line.size(); i++)
+            if (m_line[i].getRightAddr() == nullptr) // Гарантированно получаем левый конец ветки
             {
-                m_tail = &i;
+                m_tail = &m_line[i];
                 break;
             }
-        printLine();
+        //printLine();
     }
     void printLine() const {
         std::cout << "##################################" << std::endl;
         Station * cur = m_head;
-        while(cur->getRightName() != cur->getName())
+        while(cur != nullptr )
         {
             cur->printInfo();
             cur = cur ->getRightAddr();
         }
-        cur->printInfo();
         std::cout << "##################################" << std::endl;
+    }
+
+    double calculateTravelTime_min (int n1, int n2) const {
+        /*
+         * Тут получаем на вход номера станций и считаем расстояние между ними :)
+         */
+        Station *head = m_head, *tail = m_tail;
+        while (head->getNumber() != n1 && head->getNumber() != n2)
+            head = head->getRightAddr();
+        double time_min = 0;
+        if (head->getNumber() == n1 )
+        {
+            tail = head;
+            while (tail->getNumber() != n2 && tail != nullptr ){
+                time_min += tail->getRightSpan().getTime_min();
+                tail = tail->getRightAddr();
+
+            }
+
+        }
+        else
+        {
+            tail = head;
+            while (tail->getNumber() != n1 && tail != nullptr) {
+                time_min += tail->getRightSpan().getTime_min();
+                tail = tail->getRightAddr();
+            }
+        }
+        return time_min;
+
+    }
+    double calculateTravelTime_max (int n1, int n2) const {
+        Station *head = m_head, *tail = m_tail;
+        while (head->getNumber() != n1 && head->getNumber() != n2)
+            head = head->getRightAddr();
+        double time_max = 0;
+        if (head->getNumber() == n1)
+        {
+            tail = head;
+            while (tail->getNumber() != n2){
+                time_max += tail->getRightSpan().getTime_max();
+                tail = tail->getRightAddr();
+
+            }
+
+        }
+        else
+        {
+            tail = head;
+            while (tail->getNumber() != n1) {
+                time_max += tail->getRightSpan().getTime_max();
+                tail = tail->getRightAddr();
+            }
+        }
+        return time_max;
+
     }
 
 };
