@@ -4,6 +4,7 @@
  * Created by ka_7a on 19.02.2021.
 */
 
+
 #ifndef RAILWAY_SPAN_H
 #define RAILWAY_SPAN_H
 #include "station.h"

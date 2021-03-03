@@ -6,7 +6,6 @@
 #include "crossing_station.h"
 #include "Menu.h"
 
-
 std::vector<Line> getLines(const char *filename, std::vector<Line> Lines)  // Эта функция будет доставать из файла информацию о линии. Надо запилить еще миллион проверок
 {
     // -- Тут идет блок с открытием файла и парсингом его в объект, с которым дальше нужно будет работать -- //
