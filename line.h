@@ -25,45 +25,40 @@
 #include <rapidjson/filereadstream.h>
 #include <rapidjson/filewritestream.h>
 #include <cstdio>
+#include <algorithm>
 
 using namespace rapidjson;
 
 class Line {
 private:
-    std::vector<Station> m_line;    // Собсна, вектор, в котором будет храниться наш двусвязный список (так же, чтобы он нигде не потерялся)
+    std::vector<Station*> m_line;    // Собсна, вектор, в котором будет храниться наш двусвязный список (так же, чтобы он нигде не потерялся)
     std::vector<Span> m_spansList;  // Сделаем такую вот штуку, чтобы гарантированно сохранить все перегоны (чтобы ничто нигде не затерлось)
-    Station *m_head, *m_tail;        // Указатели на начало и конец ветки..
+    Station *m_head, *m_tail;       // Указатели на начало и конец ветки..
     std::string m_name;
 
-    void sortLine() {   // Этот метод в private, потому что если отсортировать вектор, а потом не связать всё заново, то ничего не будет работать
-        for (int i = 0; i < m_line.size()-1; i++)
-        {
-            int min_index = i;
-            for (int j = i+1; j < m_line.size(); j++)
-                if (m_line[j]<m_line[min_index])
-                    min_index = j;
-            if (min_index != i) {
-                Station tmp;
-                tmp = m_line[i];
-                m_line[i] = m_line[min_index];
-                m_line[min_index] = tmp;
-            }
-        }
+    int checkLine() const {
+        int counter = 0;
+        for (int i = 0; i < m_line.size(); i++)
+            if (m_line[i]->getRightAddr() == nullptr || m_line[i]->getLeftAddr() == nullptr)
+                counter++;
+        return counter;
     }
+
 public:
     Line() {
         m_head = m_tail = nullptr;
     }
-// ## Под замену ## //
-    inline void addStationToLine(const Station& S)        { m_line.push_back(S); }
-    inline void addStationToLine(const CrossingStation& S){ m_line.push_back(S); }
+
+// ## Под замену: нужно добавлять не только станцию в список, но и перегон до соседних станций, да ещё и редактировать старый, крч проблем много## //
+    inline void addStationToLine(Station* S)         { m_line.push_back(S); }
+    inline void addStationToLine(CrossingStation* S) { m_line.push_back(S); }
 // ## Меняем кое-что внутри нашей ветки
     inline void writeName(std::string name) { m_name = std::move(name); }
     inline void spanPushBack(const Span& s) { m_spansList.push_back(s); }
 // ## Получаем на выход информацию о станции
     std::string getName() const{ return m_name; }
     void printFullAllStationsInfo_list()  const{
-        Station *head = m_head, *tail = m_tail;
+        Station *head = m_head;
         while (head != nullptr)
         {
             head ->printFullInfo();
@@ -71,7 +66,7 @@ public:
         }
     }
     void printShortAllStationsInfo_list() const{
-        Station *head = m_head, *tail = m_tail;
+        Station *head = m_head;
         while (head != nullptr)
         {
             head ->printShortInfo();
@@ -80,58 +75,51 @@ public:
     }
 
     void connectLine() {
-        sortLine();
+        std::sort(m_line.begin(), m_line.end(), [] (const Station* S1, const Station* S2) -> bool { return (*S1 < *S2); });
         std::vector<Span> Sp = m_spansList;
-        std::vector<Station> St = m_line;
+        std::vector<Station*> St = m_line;
         for (long unsigned int i = 0; i < St.size(); i++)
         {
-            Station curSt = St[i];
+            Station curSt = *St[i];
             std::string st_name = curSt.getName();
             for (int j = 0; j < Sp.size(); j++) {
                 Span curSp = Sp[j];
                 std::string left = curSp.getLeft(), right = curSp.getRight();
                 if (left == st_name && left!=right)
                     for (long unsigned int k = 0; k < St.size(); k++)
-                        if (St[k].getName() == right)
+                        if (St[k]->getName() == right)
                         {
-                            m_line[i].rightConnect(&m_line[k],m_spansList[j]);
+                            m_line[i]->rightConnect(m_line[k],m_spansList[j]);
                             //std::cout <<  st_name << " -> " << right  << std::endl;
                             break;
                         }
 
                 if (right == st_name && left!=right)
                     for (long unsigned int k = 0; k < St.size(); k++)
-                        if (St[k].getName() == left)
+                        if (St[k]->getName() == left)
                         {
-                            m_line[i].leftConnect(&m_line[k],m_spansList[j]);
+                            m_line[i]->leftConnect(m_line[k],m_spansList[j]);
                             //std::cout << left << " <- " << st_name << std::endl;
                             break;
                         }
             }
         }
-        for (int i = 0; i < m_line.size(); i++)
-            if (m_line[i].getLeftAddr() == nullptr) // Гарантированно получаем левый конец ветки
+        for (int i = 0; i < m_line.size(); i++) // Цикл не меняю на модную конструкцию, потому что к ней не привык
+            if (m_line[i]->getLeftAddr() == nullptr) // Гарантированно получаем левый конец ветки
             {
-                m_head = &m_line[i];
+                m_head = m_line[i];
                 break;
             }
-        for (int i = 0; i < m_line.size(); i++)
-            if (m_line[i].getRightAddr() == nullptr) // Гарантированно получаем левый конец ветки
+        for (int i = 0; i < m_line.size(); i++) // Вообще такой вот способ мне не очень нравится, тут вроде нужны итераторы
+            if (m_line[i]->getRightAddr() == nullptr) // Гарантированно получаем правый конец ветки
             {
-                m_tail = &m_line[i];
+                m_tail = m_line[i];
                 break;
             }
         //printLine();
-        assert(checkLine() == 2);
+        assert(checkLine() == 2);   // Проверка на случай, если у нас не хватает слишком большого количества перегонов
     }
 
-    int checkLine() const {
-        int counter = 0;
-        for (int i = 0; i < m_line.size(); i++)
-            if (m_line[i].getRightAddr() == nullptr || m_line[i].getLeftAddr() == nullptr)
-                counter++;
-        return counter;
-    }
 
     double calculateTravelTime_min (int n1, int n2) const {
         /*
@@ -212,6 +200,12 @@ public:
             }
         }
         return time_max;
+    }
+
+    ~Line() // Деструктор, который обязательно мне пригодится, когда всё переедет на указатели... Когда-нибудь))
+    {
+        for (int i = 0; i < m_line.size(); i++)
+            delete(m_line[i]);
     }
 
 };

@@ -95,29 +95,20 @@ std::vector<Line> getLines(const char *filename, std::vector<Line> Lines)  // Э
             {   // То создаем станцию
                 //std::cout << "\n============================\n num: " << St["number"].GetInt() << "\ntraffic: " << St["traffic"].GetInt() << "\nname: " << St["name"].GetString() << "\n============================\n" << std::endl;
 
-                CrossingStation tmpStation( tmpNum,
-                                            St["traffic"].GetInt(),
-                                            St["name"].GetString());
+                CrossingStation *tmpStation;
+                tmpStation = new CrossingStation(tmpNum, St["traffic"].GetInt(), St["name"].GetString());
 
                 for (unsigned int k = 0; k < St["cross_to"].Size(); k++) // И запихиваем в неё все станции пересадки.
                 {
                     assert(St["cross_to"][k].IsString());
-                    tmpStation.addCrossingStation(St["cross_to"][k].GetString());
+                    tmpStation->addCrossingStation(St["cross_to"][k].GetString());
                 }
                 tmpLine.addStationToLine(tmpStation);
-                // tmpStation.printInfo();
-                // tmpStation.printCrossStations();
             }
             else    // Иначе станция обычная, и с ней головной боли должно быть меньше
-                {
-                //std::cout << "\n============================\n num: " << St["number"].GetInt() << "\ntraffic: " << St["traffic"].GetInt() << "\nname: " << St["name"].GetString() << "\n============================\n" << std::endl;
+                tmpLine.addStationToLine(new Station(tmpNum, St["traffic"].GetInt(), St["name"].GetString()));       // Тут добавляем станцию в вектор
 
-                Station tmpStation(tmpNum,
-                                   St["traffic"].GetInt(),
-                                   St["name"].GetString());
-                tmpLine.addStationToLine(tmpStation);       // Тут добавляем станцию в вектор
-                // tmpStation.printInfo();
-            }
+
         }
 
         Lines.push_back(tmpLine);

@@ -53,6 +53,12 @@ public:
 // ## Меняем время перегона. Больше ничего менять не планируется
     inline void setTime_min(double min) { m_minTime = min; }
     inline void setTime_max(double max) { m_maxTime = max; }
+// ## Деструктор
+    ~Span()
+    {
+        m_left_st.clear();
+        m_right_st.clear();
+    }
 };
 
 

@@ -6,6 +6,8 @@
 #ifndef OOP_2_MENU_H
 #define OOP_2_MENU_H
 #include "line.h"
+#include <iostream>
+#include <limits>
 
 class Menu {
 private:
@@ -18,11 +20,20 @@ public:
         while (choice)
         {
             drawMainMenu();
+            // Следующие две строчки спасают программу от кривого ввода
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::cin >> choice;
+
             switch (choice){
                 case 1:
                 {
                     drawStations(0);
+                    break;
+                }
+                case 2:
+                {
+                    std::cout << "This part is still under development." << std::endl;
                     break;
                 }
                 case 3:
@@ -48,7 +59,10 @@ public:
                     exit(0);
                 }
                 default:
+                {
+                    std::cin.clear();
                     continue;
+                }
             }
         }
     }

@@ -22,11 +22,11 @@ private:
 public:
     Station(void)
     {
-        m_number = 0;
+        m_number     = 0;
         m_av_traffic = 0;
-        m_name = "Unnamed";
+        m_name = "Unnamed\n";
         m_next = m_prev = nullptr;
-        m_isRegular = true;     // По дефолту все станции у нас сначала обычные
+        m_isRegular  = true;     // По дефолту все станции у нас сначала обычные
     }
     Station(int number, int av_traffic, std::string name) {  // Такой вот странный конструктор, который, почему-то, не вызывается. Сцука такая
         m_number = number;
@@ -44,55 +44,57 @@ public:
         m_next = m_prev = nullptr;
         m_isRegular = true;
     }
-
     // ## Соединяем станции ## //
-    inline void rightConnect(Station *next, Span &right ) { m_next = next ; m_right = right; }
-    inline void leftConnect (Station *prev, Span &left)   { m_prev = prev ; m_left  = left;  }
+    inline void rightConnect(Station *next, Span &right )  { m_next = next ; m_right = right; }
+    inline void leftConnect (Station *prev, Span &left)    { m_prev = prev ; m_left  = left;  }
 
     // ## Меняем кое-какие показатели ## //
     inline void changeToType (bool type)        { m_isRegular = type;         }
-    inline void TrafficChange(int new_traffic)  { m_av_traffic = new_traffic; }
-    inline void ChangeTypeToCrossing()          { m_isRegular = false; }    // Не спрашивай, почему оно вот так
+    inline void changeTraffic(int new_traffic)  { m_av_traffic = new_traffic; }
 
-    // ## Выдаем всю информацию о станции на печать ## //
+    virtual // ## Выдаем всю информацию о станции на печать ## //
     void printFullInfo()  const {
         std::cout << "_________________________" << std::endl;
         std::cout << "| name: " << m_name             << std::endl <<
-                     "| num: "  << m_number           << std::endl <<
-                     "| av_traffic: " << m_av_traffic << std::endl;
-        if (m_isRegular)
-        std::cout << "| Type: regular" << std::endl;
-        else
-        std::cout << "| Type: crossing" << std::endl;
-        std::cout << "| neighbours: "   << std::endl;
+                     "| num : " << m_number           << std::endl <<
+                     "| av_traffic: " << m_av_traffic << std::endl <<
+                     "| Type: regular"                << std::endl <<
+                     "| neighbours: "   << std::endl;
         if (getLeftAddr() ) std::cout << "| l:" << getLeftName()  << std::endl;
         if (getRightAddr()) std::cout << "| r:" << getRightName() << std::endl;
         std::cout  << "|________________________"  << std::endl;
     }
     void printShortInfo() const {
-        std::cout << "\n-----------------------" << std::endl;
-        std::cout << "name: " << m_name << std::endl <<
-                     "num : " << m_number << std::endl;
-        std::cout << "-----------------------" << std::endl;
+        std::cout << "|---------------------------" << std::endl;
+        std::cout << "| name: " << m_name << std::endl <<
+                     "| num : " << m_number << std:: endl; //"_____________" << std::endl;
     }
 
 // #### Получаем информацию о самой станции #### //
-    inline int  getNumber()  const { return m_number;       }
-    inline int  getTraffic() const { return m_av_traffic;   }
-    inline std::string getName()   { return m_name;         }
-    inline bool isCrossing() const { return (!m_isRegular); }
+    inline int  getNumber()      const { return m_number;       }
+    inline int  getTraffic()     const { return m_av_traffic;   }
+    inline std::string getName() const { return m_name;         }
+    inline bool isCrossing()     const { return (!m_isRegular); }
 
 // #### Получаем информацию о соседях станции ### //
-    inline std::string getLeftName()  const { return m_prev->getName(); }
-    inline std::string getRightName() const { return m_next->getName(); }
-    inline Station * getLeftAddr()    const { return m_prev; }
-    inline Station * getRightAddr()   const { return m_next; }
+    inline std::string getLeftName()   const { return m_prev->getName(); }
+    inline std::string getRightName()  const { return m_next->getName(); }
+    inline Station * getLeftAddr()     const { return m_prev; }
+    inline Station * getRightAddr()    const { return m_next; }
+    inline double getTimeToLeft_min()  const { return m_left.getTime_min() ; }
+    inline double getTimeToLeft_max()  const { return m_left.getTime_max() ; }
+    inline double getTimeToRight_min() const { return m_right.getTime_min(); }
+    inline double getTimeToRight_max() const { return m_right.getTime_max(); }
 // И перегонах
     inline Span getLeftSpan()  const { return m_left;  }
     inline Span getRightSpan() const { return m_right; }
 // #### Перегружаем операторы ##### //
     bool operator== (const Station &S2) const { return (m_number == S2.m_number); }
-    bool operator<  (const Station &S2) const { return (m_number < S2.m_number);  }
+    bool operator<  (const Station &S2) const { return (m_number < S2.m_number) ; }
 
+    ~Station()
+    {
+        std::cout << "Pshel nah" << std::endl;
+    }
 };
 #endif //RAILWAY_STATION_H
