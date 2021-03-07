@@ -16,12 +16,10 @@ class CrossingStation : public Station {
     public:
         CrossingStation()   // Дефолтный конструктор
         {
-            std::cout << "Crossing station" << getName() << std::endl;
             fill(0, 0, "Unnamed");
             changeToType(false);
         }
         CrossingStation(int number, int av_traffic, std::string name){
-            std::cout << "Crossing station " << name << std::endl;
             fill(number, av_traffic, name);   // Заполняем поля нужным содержимым
             changeToType(false);         // Меняем тип станции на пересадочную (костыль)
         }
@@ -63,7 +61,6 @@ class CrossingStation : public Station {
 
         ~CrossingStation () override // Кажется, тут что-то должно быть по другому
         {
-            std::cout << "~Crossing station " << getName() << " :";
             m_CrossList.clear();
         }
 };

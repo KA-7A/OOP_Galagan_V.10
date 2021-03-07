@@ -91,7 +91,6 @@ public:
                         if (St[k]->getName() == right)
                         {
                             m_line[i]->rightConnect(m_line[k],m_spansList[j]);
-                            //std::cout <<  st_name << " -> " << right  << std::endl;
                             break;
                         }
 
@@ -100,7 +99,6 @@ public:
                         if (St[k]->getName() == left)
                         {
                             m_line[i]->leftConnect(m_line[k],m_spansList[j]);
-                            //std::cout << left << " <- " << st_name << std::endl;
                             break;
                         }
             }
@@ -167,7 +165,7 @@ public:
 
     }
     double calculateTravelTime_max (int n1, int n2) const {
-        Station *head = m_head, *tail = m_tail;
+        Station *head = m_head, *tail;
         while (head != nullptr && head->getNumber() != n1 && head->getNumber() != n2)
             head = head->getRightAddr();
         if (head == nullptr)

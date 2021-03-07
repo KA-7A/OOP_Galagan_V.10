@@ -22,7 +22,6 @@ private:
 public:
     Station(void)   // Дефолтный конструктор
     {
-        std::cout << " Station unnamed created" << std::endl;
         m_number     = 0;
         m_av_traffic = 0;
         m_name = "Unnamed";
@@ -31,7 +30,6 @@ public:
     }
     //
     Station(int number, int av_traffic, std::string name) {
-        std::cout << "Station " << name << " created " << std::endl;
         m_number = number;
         m_av_traffic = av_traffic;
         m_name = name;
@@ -95,9 +93,6 @@ public:
     bool operator== (const Station &S2) const { return (m_number == S2.m_number); }
     bool operator<  (const Station &S2) const { return (m_number < S2.m_number) ; }
 
-    virtual ~Station()  // Не знаю, что тут вообще нужно написать :с
-    {           // И нужно ли вообще.
-        std::cout << "~Station " << m_name << "  Destroyed" << std::endl;
-    }
+    virtual ~Station(){}
 };
 #endif //RAILWAY_STATION_H
