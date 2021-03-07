@@ -24,6 +24,7 @@
 #include <rapidjson/document.h>
 #include <rapidjson/filereadstream.h>
 #include <rapidjson/filewritestream.h>
+
 #include <cstdio>
 #include <algorithm>
 
@@ -31,9 +32,9 @@ using namespace rapidjson;
 
 class Line {
 private:
-    std::vector<Station*> m_line;    // Собсна, вектор, в котором будет храниться наш двусвязный список (так же, чтобы он нигде не потерялся)
+    std::vector<Station*> m_line;   // Собственно, вектор, в котором будет храниться наш двусвязный список
     std::vector<Span> m_spansList;  // Сделаем такую вот штуку, чтобы гарантированно сохранить все перегоны (чтобы ничто нигде не затерлось)
-    Station *m_head, *m_tail;       // Указатели на начало и конец ветки..
+    Station *m_head, *m_tail;       // Указатели на начало и конец ветки.. (необходимый двусвязный список)
     std::string m_name;
 
     int checkLine() const {
@@ -49,7 +50,7 @@ public:
         m_head = m_tail = nullptr;
     }
 
-// ## Под замену: нужно добавлять не только станцию в список, но и перегон до соседних станций, да ещё и редактировать старый, крч проблем много## //
+// ## Надо будет поменять названия, потому что они слегка не соответствуют тому, что должны делать ## //
     inline void addStationToLine(Station* S)         { m_line.push_back(S); }
     inline void addStationToLine(CrossingStation* S) { m_line.push_back(S); }
 // ## Меняем кое-что внутри нашей ветки
@@ -73,7 +74,7 @@ public:
             head = head->getRightAddr();
         }
     }
-
+// ## Метод связывания вектора в связный список
     void connectLine() {
         std::sort(m_line.begin(), m_line.end(), [] (const Station* S1, const Station* S2) -> bool { return (*S1 < *S2); });
         std::vector<Span> Sp = m_spansList;
@@ -104,7 +105,9 @@ public:
                         }
             }
         }
-        for (int i = 0; i < m_line.size(); i++) // Цикл не меняю на модную конструкцию, потому что к ней не привык
+        assert(checkLine() == 2);   // Проверка на случай, если у нас не хватает слишком большого количества перегонов
+
+        for (int i = 0; i < m_line.size(); i++) // Цикл не меняю на модную конструкцию, которую предлагает IDE, потому что к ней не привык
             if (m_line[i]->getLeftAddr() == nullptr) // Гарантированно получаем левый конец ветки
             {
                 m_head = m_line[i];
@@ -117,15 +120,15 @@ public:
                 break;
             }
         //printLine();
-        assert(checkLine() == 2);   // Проверка на случай, если у нас не хватает слишком большого количества перегонов
     }
 
-
+// ## Методы с расчетом максимального/ минималььного времени
     double calculateTravelTime_min (int n1, int n2) const {
         /*
-         * Тут получаем на вход номера станций и считаем расстояние между ними :)
+         * Смысл: проходим по всему двусвязному списку с начала и до конца, отмечаем...
+         * Ну, понятно, что отмечаем и считаем
          */
-        Station *head = m_head, *tail = m_tail;
+        Station *head = m_head, *tail;
         while (head != nullptr && head->getNumber() != n1 && head->getNumber() != n2)
             head = head->getRightAddr();
         if (head == nullptr)
@@ -202,10 +205,15 @@ public:
         return time_max;
     }
 
-    ~Line() // Деструктор, который обязательно мне пригодится, когда всё переедет на указатели... Когда-нибудь))
+    ~Line() // Деструктор, в котором происходят ошибки, на которые ругается программа в рантайме (double free() или что-то в этом духе)
     {
-        for (int i = 0; i < m_line.size(); i++)
-            delete(m_line[i]);
+        Station *cur = m_head, *tmp;
+        while (cur != nullptr)
+        {
+            tmp = cur ->getRightAddr();
+            delete cur;
+            cur = tmp;
+        }
     }
 
 };

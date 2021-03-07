@@ -14,19 +14,19 @@ class CrossingStation : public Station {
     private:
         std::vector<std::string> m_CrossList;
     public:
-        CrossingStation()
+        CrossingStation()   // Дефолтный конструктор
         {
             fill(0, 0, "Unnamed");
             changeToType(false);
         }
         CrossingStation(int number, int av_traffic, std::string name){
-            fill(number, av_traffic, std::move(name));
-            changeToType(false);
+            fill(number, av_traffic, name);   // Заполняем поля нужным содержимым
+            changeToType(false);         // Меняем тип станции на пересадочную (костыль)
         }
-        std::vector<std::string> getCrossingStations() const    { return m_CrossList; }
-        inline void addCrossingStation(const std::string& name) { m_CrossList.push_back(name); }
+        std::vector<std::string> getCrossingStations() const    { return m_CrossList;           }
+        inline void addCrossingStation(const std::string name)  { m_CrossList.push_back(name);  }
 
-        void printFullInfo() const override {
+        void printFullInfo() const override {      // Вывод на печать всей информации о станции
             std::cout << "_________________________"        << std::endl <<
                          "| name: "       << getName()      << std::endl <<
                          "| num : "       << getNumber()    << std::endl <<
@@ -41,7 +41,7 @@ class CrossingStation : public Station {
             std::cout  << "|________________________"  << std::endl;
         }
 
-// ## Вообще не факт, что это когда-либо пригодится, но пусть будет
+// ## Вообще не факт, что это когда-либо пригодится, но пусть будет (ничего не тестил, не факт что вообще работает)
         void rmCrossingStationByName    (const std::string& name) {
             for (long unsigned int i = 0; i != m_CrossList.size(); ++i)  // Trying to find the station in m_CrossList
                 if (m_CrossList[i] == name)
@@ -53,15 +53,15 @@ class CrossingStation : public Station {
         }
         void rmCrossingStationByPosition(int pos) { m_CrossList.erase(m_CrossList.begin() + pos); }
         inline void rmAllCrossingStations()       { m_CrossList.clear(); }
-        inline void printCrossStations() const    {
+        void printCrossStations() const {
             std::cout << "Cross to: \n";
             for (long unsigned int i = 0; i < m_CrossList.size(); std::cout << "--\"" << m_CrossList[i] << "\"" << std::endl, i++);
             std::cout << "-------------------" << std::endl;
         }
-        ~CrossingStation ()
+
+        ~CrossingStation () // Кажется, тут что-то должно быть по другому
         {
             m_CrossList.clear();
-            delete(&m_CrossList);
         }
 };
 

@@ -17,10 +17,10 @@ private:
     int m_av_traffic;           // Значение среднего траффика
     std::string m_name;         // Имя станции
     Station *m_next, *m_prev;   // Указатели на соседние станции. Ну потому что по ТЗ это д.б. связанный список. Если что-то нулл, то это конечная
-    Span m_left, m_right;       // Указатели на перегоны до соседних станций.
-    bool m_isRegular;           // true -- станция обычная, false -- пересадочная. Мне не нрав такой момент, но пусть будет
+            Span m_left, m_right;       // Перегоны до соседних станций. Надо использовать указатели. Исправить.
+            bool m_isRegular;           // true -- станция обычная, false -- пересадочная. ( Костыль, надо переделать )
 public:
-    Station(void)
+    Station(void)   // Дефолтный конструктор
     {
         m_number     = 0;
         m_av_traffic = 0;
@@ -28,7 +28,8 @@ public:
         m_next = m_prev = nullptr;
         m_isRegular  = true;     // По дефолту все станции у нас сначала обычные
     }
-    Station(int number, int av_traffic, std::string name) {  // Такой вот странный конструктор, который, почему-то, не вызывается. Сцука такая
+    //
+    Station(int number, int av_traffic, std::string name) {
         m_number = number;
         m_av_traffic = av_traffic;
         m_name = name;
@@ -41,8 +42,6 @@ public:
         m_number = number;
         m_name = std::move(name);
         m_av_traffic = av_traffic;
-        m_next = m_prev = nullptr;
-        m_isRegular = true;
     }
     // ## Соединяем станции ## //
     inline void rightConnect(Station *next, Span &right )  { m_next = next ; m_right = right; }
@@ -52,22 +51,23 @@ public:
     inline void changeToType (bool type)        { m_isRegular = type;         }
     inline void changeTraffic(int new_traffic)  { m_av_traffic = new_traffic; }
 
-    virtual // ## Выдаем всю информацию о станции на печать ## //
+    // ## Выдаем всю информацию о станции на печать ## //
+    virtual // <-- Это ключевое слово поставила IDE, когда я попробовал перегрузить этот метод для дочернего класса
     void printFullInfo()  const {
         std::cout << "_________________________" << std::endl;
-        std::cout << "| name: " << m_name             << std::endl <<
-                     "| num : " << m_number           << std::endl <<
-                     "| av_traffic: " << m_av_traffic << std::endl <<
-                     "| Type: regular"                << std::endl <<
-                     "| neighbours: "   << std::endl;
+        std::cout << "| name: "         << m_name       << std::endl <<
+                     "| num : "         << m_number     << std::endl <<
+                     "| av_traffic: "   << m_av_traffic << std::endl <<
+                     "| Type: regular"                  << std::endl <<
+                     "| neighbours: "                   << std::endl;
         if (getLeftAddr() ) std::cout << "| l:" << getLeftName()  << std::endl;
         if (getRightAddr()) std::cout << "| r:" << getRightName() << std::endl;
         std::cout  << "|________________________"  << std::endl;
     }
     void printShortInfo() const {
         std::cout << "|---------------------------" << std::endl;
-        std::cout << "| name: " << m_name << std::endl <<
-                     "| num : " << m_number << std:: endl; //"_____________" << std::endl;
+        std::cout << "| name: " << m_name   << std::endl <<
+                     "| num : " << m_number << std::endl;
     }
 
 // #### Получаем информацию о самой станции #### //
@@ -92,9 +92,12 @@ public:
     bool operator== (const Station &S2) const { return (m_number == S2.m_number); }
     bool operator<  (const Station &S2) const { return (m_number < S2.m_number) ; }
 
-    ~Station()
-    {
-        std::cout << "Pshel nah" << std::endl;
+    virtual ~Station()  // Не знаю, что тут вообще нужно написать :с
+    {           // И нужно ли вообще.
+        /*if (m_next != nullptr)
+            delete (m_next);
+        if (m_prev != nullptr)
+            delete (m_prev);*/
     }
 };
 #endif //RAILWAY_STATION_H

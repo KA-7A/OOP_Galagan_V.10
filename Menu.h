@@ -13,39 +13,36 @@ class Menu {
 private:
     std::vector<Line> Lines;
 public:
-    Menu (std::vector<Line> linesList)
+    Menu (std::vector<Line> linesList) // Это надо запихнуть в отдельную функцию и спрятать в отдельный файл. Не понимаю, как.
     {
         Lines = linesList;
         int choice = 1;
-        while (choice)
-        {
+        while (choice) {
             drawMainMenu();
             // Следующие две строчки спасают программу от кривого ввода
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::cin >> choice;
 
-            switch (choice){
-                case 1:
-                {
-                    drawStations(0);
+            switch (choice) {
+                case 1: {
+                    drawStations(0);  // mode 0 for full  info
+                                            // mode 1 for short info
                     break;
                 }
-                case 2:
-                {
+                case 2: {
                     std::cout << "This part is still under development." << std::endl;
                     break;
                 }
-                case 3:
-                {
+                case 3: {
                     int lineNum = drawStations(1);
-                    std::cout << " Which stations are you interested in? Type it's numbers \n >>" ;
+                    std::cout << " Which stations are you interested in? Type it's numbers \n >>";
                     int n1, n2;
                     std::cin >> n1 >> n2;
-                    if ( (n1 / 1000) != (lineNum + 1) || (n2 / 1000) != (lineNum + 1) )
-                        std::cout << " Incorrect input: These stations do not belong to the selected line " << std::endl;
-                    else
-                    {
+                    if ((n1 / 1000) != (lineNum + 1) || (n2 / 1000) != (lineNum + 1))
+                        std::cout << " Incorrect input: These stations do not belong to the selected line "
+                                  << std::endl;
+                    else {
                         double minTime = Lines[lineNum].calculateTravelTime_min(n1, n2);
                         double maxTime = Lines[lineNum].calculateTravelTime_max(n1, n2);
                         if (!(minTime == -1 || maxTime == -1))
@@ -53,13 +50,11 @@ public:
                     }
                     break;
                 }
-                case 0:
-                {
+                case 0: {
                     std::cout << "Bye, see you next time" << std::endl;
                     exit(0);
                 }
-                default:
-                {
+                default: {
                     std::cin.clear();
                     continue;
                 }
@@ -82,14 +77,13 @@ public:
                 else
                     Lines[ans].printShortAllStationsInfo_list();
                 return ans;
-            }
-            else {
+            } else {
                 std::cout << "Incorrect choice!" << std::endl;
                 ans = -2;
             }
         }
         return -1;
-    }
+    };
     static void drawMainMenu() {
         std::cout << " ************** Menu **************" << std::endl;
         std::cout << " * 1. Show all stations           *" << std::endl;
@@ -97,7 +91,8 @@ public:
         std::cout << " * 3. Calculate travel time       *" << std::endl;
         std::cout << " *                                *" << std::endl;
         std::cout << " * 0. Exit                        *" << std::endl;
-        std::cout << " **********************************" << std::endl << " >> ";}
+        std::cout << " **********************************" << std::endl << " >> ";
+    };
 };
 
 

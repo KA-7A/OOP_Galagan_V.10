@@ -18,8 +18,7 @@ public:
     Span() {
         m_minTime = m_maxTime = 0;
     }
-    Span(const char* S1, const char* S2, double minTime, double maxTime){ // Передали по ссылке, теперь можем их менять как вздумается
-
+    Span(const char* S1, const char* S2, double minTime, double maxTime){
         if (minTime > maxTime) {
             std::cout << "Incorrect input: minTime > maxTime! I'll swap it" << std::endl;
             m_minTime = maxTime;
@@ -31,7 +30,7 @@ public:
         m_left_st = S1;
         m_right_st = S2;
     }
-    Span(const char* S1, const char* S2, double time)
+    Span(const char* S1, const char* S2, double time)   // Конструктор, который использовался в самом начале на этапе отладки
     {
         if (time == 0) {
             m_maxTime = m_minTime = 0;
@@ -54,11 +53,7 @@ public:
     inline void setTime_min(double min) { m_minTime = min; }
     inline void setTime_max(double max) { m_maxTime = max; }
 // ## Деструктор
-    ~Span()
-    {
-        m_left_st.clear();
-        m_right_st.clear();
-    }
+    ~Span() {} // Не знаю, что тут надо чистить (и надо ли)
 };
 
 
