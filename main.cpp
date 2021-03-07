@@ -6,7 +6,7 @@
 #include "crossing_station.h"
 #include "Menu.h"
 
-std::vector<Line> getLines(const char *filename, std::vector<Line> Lines)  // Эта функция будет доставать из файла информацию о линии. Надо запилить еще миллион проверок
+std::vector<Line*> getLines(const char *filename, std::vector<Line*> Lines)  // Эта функция будет доставать из файла информацию о линии. Надо запилить еще миллион проверок
 {
     // -- Тут идет блок с открытием файла и парсингом его в объект, с которым дальше нужно будет работать -- //
 //--- Parsing from file to object ---//
@@ -51,7 +51,7 @@ std::vector<Line> getLines(const char *filename, std::vector<Line> Lines)  // Э
          * крч element -- это JSON одной станции следующего вида:
          * { "name" : ... , ... }
          */
-        Line tmpLine;
+        Lines.push_back(new Line);
 // ---------- Here is Spans filling block ------------------ //
         //std::cout << "lineNum == "<< i <<"; lineName is "<< lineName << ";" << std::endl;
         std::vector<Span> span_vector;
@@ -67,14 +67,14 @@ std::vector<Line> getLines(const char *filename, std::vector<Line> Lines)  // Э
             && Sp.HasMember("max_time")  && (Sp["max_time"].IsDouble() || Sp["max_time"].IsInt()) && Sp["max_time"].GetDouble() >= 0
             );
             Span tmpSpan(Sp["left"].GetString(), Sp["right"].GetString(), Sp["min_time"].GetDouble(), Sp["max_time"].GetDouble());
-            tmpLine.spanPushBack(tmpSpan);
+            Lines[i]->spanPushBack(tmpSpan);
         }
 // ---------- Here is Lines filling and connection block -- //
         // -- Вот до этого момента мы загнали линию в отдельный объект. -- //
 
-        tmpLine.writeName(lineName);    // Сохранили название ветки
-        for (unsigned int j = 0; j < line.Size(); j++)     // Идем по станциям в этой линии
-        {
+        Lines[i]->writeName(lineName);    // Сохранили название ветки
+        for (unsigned int j = 0; j < line.Size(); j++){     // Идем по станциям в этой линии
+
             const Value& St = line[j];
             // Document st = linesObj[lineName.c_str()][j];
             // Проверяем, что объект, который мы тут читаем, вообще подходит под формат станции (под нужный нам формат)
@@ -107,21 +107,22 @@ std::vector<Line> getLines(const char *filename, std::vector<Line> Lines)  // Э
                     assert(St["cross_to"][k].IsString());
                     tmpStation->addCrossingStation(St["cross_to"][k].GetString());
                 }
-                tmpLine.addStationToLine(tmpStation);
+                Lines[i]->addStationToLine(tmpStation);
             }
             else    // Иначе станция обычная, и с ней головной боли сильно меньше.
-                tmpLine.addStationToLine(new Station(tmpNum, St["traffic"].GetInt(), St["name"].GetString()));
+                Lines[i]->addStationToLine(new Station(tmpNum, St["traffic"].GetInt(), St["name"].GetString()));
         }
-
-        Lines.push_back(tmpLine);   // Добавили нашу недо-ветку в вектор (недо- она потому что там всё вперемешку и станции не связаны между собой
-        Lines[i].connectLine();     // Там происходит сортировка внутри вектора и связывание всех станций в ветку
+        Lines[i]->connectLine();     // Там происходит сортировка внутри вектора и связывание всех станций в ветку
     }
     return Lines;
 }
 
 
 int main() {
-    std::vector<Line> Lines = {};
-    Menu Menu(getLines("/home/ka_7a/Desktop/MIPT/OOP_2/Saves/State.json", Lines));  // Возможно можно обойтись 1 переменной, мб - двумя. Просто хз как работает вектор
+    std::vector<Line*> Lines;
+    Lines = getLines("/home/ka_7a/Desktop/MIPT/OOP_2/Saves/State.json", Lines);
+    Menu Menu(Lines);  // Возможно можно обойтись 1 переменной, мб - двумя. Просто хз как работает вектор
+    for( int i = 0; i < Lines.size(); i++)
+        delete Lines[i];
     return 0;
 }

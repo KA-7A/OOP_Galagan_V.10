@@ -22,14 +22,16 @@ private:
 public:
     Station(void)   // Дефолтный конструктор
     {
+        std::cout << " Station unnamed created" << std::endl;
         m_number     = 0;
         m_av_traffic = 0;
-        m_name = "Unnamed\n";
+        m_name = "Unnamed";
         m_next = m_prev = nullptr;
         m_isRegular  = true;     // По дефолту все станции у нас сначала обычные
     }
     //
     Station(int number, int av_traffic, std::string name) {
+        std::cout << "Station " << name << " created " << std::endl;
         m_number = number;
         m_av_traffic = av_traffic;
         m_name = name;
@@ -39,6 +41,7 @@ public:
     }
 // #### Производим манипуляции с самой станцией #### //
     void fill(int number, int av_traffic, std::string name){    // Заполняем основные поля станции
+
         m_number = number;
         m_name = std::move(name);
         m_av_traffic = av_traffic;
@@ -94,10 +97,7 @@ public:
 
     virtual ~Station()  // Не знаю, что тут вообще нужно написать :с
     {           // И нужно ли вообще.
-        /*if (m_next != nullptr)
-            delete (m_next);
-        if (m_prev != nullptr)
-            delete (m_prev);*/
+        std::cout << "~Station " << m_name << "  Destroyed" << std::endl;
     }
 };
 #endif //RAILWAY_STATION_H

@@ -205,15 +205,10 @@ public:
         return time_max;
     }
 
-    ~Line() // Деструктор, в котором происходят ошибки, на которые ругается программа в рантайме (double free() или что-то в этом духе)
+    ~Line()
     {
-        Station *cur = m_head, *tmp;
-        while (cur != nullptr)
-        {
-            tmp = cur ->getRightAddr();
-            delete cur;
-            cur = tmp;
-        }
+        for (int i = m_line.size(); i >=0 ; i--)
+            delete m_line[i];
     }
 
 };

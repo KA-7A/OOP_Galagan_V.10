@@ -11,9 +11,9 @@
 
 class Menu {
 private:
-    std::vector<Line> Lines;
+    std::vector<Line*> Lines;
 public:
-    Menu (std::vector<Line> linesList) // Это надо запихнуть в отдельную функцию и спрятать в отдельный файл. Не понимаю, как.
+    Menu (std::vector<Line*> linesList) // Это надо запихнуть в отдельную функцию и спрятать в отдельный файл. Не понимаю, как.
     {
         Lines = linesList;
         int choice = 1;
@@ -43,16 +43,16 @@ public:
                         std::cout << " Incorrect input: These stations do not belong to the selected line "
                                   << std::endl;
                     else {
-                        double minTime = Lines[lineNum].calculateTravelTime_min(n1, n2);
-                        double maxTime = Lines[lineNum].calculateTravelTime_max(n1, n2);
+                        double minTime = Lines[lineNum]->calculateTravelTime_min(n1, n2);
+                        double maxTime = Lines[lineNum]->calculateTravelTime_max(n1, n2);
                         if (!(minTime == -1 || maxTime == -1))
                             std::cout << "min time: " << minTime << " || max time: " << maxTime << std::endl;
                     }
                     break;
                 }
-                case 0: {
+                case 0: {   // Кнопка в меню на случай, если мы захотим выйти из программы
                     std::cout << "Bye, see you next time" << std::endl;
-                    exit(0);
+                    return ;
                 }
                 default: {
                     std::cin.clear();
@@ -66,16 +66,16 @@ public:
         while (ans == -2) {
             std::cout << " ## Which line are you interested in? ##" << std::endl;
             for (int i = 0;
-                 i < Lines.size(); std::cout << " #  " << i << ". " << Lines[i].getName() << ";" << std::endl, i++);
+                 i < Lines.size(); std::cout << " #  " << i << ". " << Lines[i]->getName() << ";" << std::endl, i++);
             std::cout << " #\n # -1. Return to main menu " << std::endl << " >> ";
             std::cin >> ans;
             if (ans == -1)
                 return -1;
             if (ans >= 0 && ans < Lines.size()) {
                 if (!mode)
-                    Lines[ans].printFullAllStationsInfo_list();
+                    Lines[ans]->printFullAllStationsInfo_list();
                 else
-                    Lines[ans].printShortAllStationsInfo_list();
+                    Lines[ans]->printShortAllStationsInfo_list();
                 return ans;
             } else {
                 std::cout << "Incorrect choice!" << std::endl;
