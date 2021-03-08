@@ -27,14 +27,15 @@ public:
             m_minTime = minTime;
             m_maxTime = maxTime;
         }
+        if (minTime < 0) m_minTime = 0;
+        if (maxTime < 0) m_maxTime = 0;
         m_left_st = S1;
         m_right_st = S2;
     }
     Span(const char* S1, const char* S2, double time)   // Конструктор, который использовался в самом начале на этапе отладки
     {
-        if (time == 0) {
+        if (time == 0)
             m_maxTime = m_minTime = 0;
-        }
         else
         {
             m_minTime = time;
