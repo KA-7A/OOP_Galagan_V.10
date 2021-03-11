@@ -20,7 +20,6 @@ public:
     }
     Span(const char* S1, const char* S2, double minTime, double maxTime){
         if (minTime > maxTime) {
-            std::cout << "Incorrect input: minTime > maxTime! I'll swap it" << std::endl;
             m_minTime = maxTime;
             m_maxTime = minTime;
         } else {
@@ -45,8 +44,8 @@ public:
         m_right_st = S2;
     }
 // ## Получем имена соседних станций
-    inline std::string getLeft()  const { return m_left_st; }
-    inline std::string getRight() const { return m_right_st; }
+    inline const std::string& getLeft()  const { return m_left_st; }
+    inline const std::string& getRight() const { return m_right_st; }
 // ## Получаем время, за которое можно пересечь этот перегон
     inline double getTime_min() const   { return m_minTime; }
     inline double getTime_max() const   { return m_maxTime; }

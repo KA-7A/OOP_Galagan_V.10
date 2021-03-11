@@ -51,8 +51,7 @@ public:
     }
 
 // ## Надо будет поменять названия, потому что они слегка не соответствуют тому, что должны делать ## //
-    inline void addStationToLine(Station* S)         { m_line.push_back(S); }
-    inline void addStationToLine(CrossingStation* S) { m_line.push_back(S); }
+    inline void addStationToLine(Station* S){ m_line.push_back(S);      }
 // ## Меняем кое-что внутри нашей ветки
     inline void writeName(std::string name) { m_name = std::move(name); }
     inline void spanPushBack(const Span& s) { m_spansList.push_back(s); }

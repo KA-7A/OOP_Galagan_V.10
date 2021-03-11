@@ -17,12 +17,11 @@ class CrossingStation : public Station {
         CrossingStation()   // Дефолтный конструктор
         {
             fill(0, 0, "Unnamed");
-            changeToType(false);
         }
         CrossingStation(int number, int av_traffic, std::string name){
             fill(number, av_traffic, name);   // Заполняем поля нужным содержимым
-            changeToType(false);         // Меняем тип станции на пересадочную (костыль)
         }
+        inline bool isCrossing() const override                 { return true; }
         std::vector<std::string> getCrossingStations() const    { return m_CrossList;           }
         inline void addCrossingStation(const std::string name)  { m_CrossList.push_back(name);  }
 
@@ -59,10 +58,8 @@ class CrossingStation : public Station {
             std::cout << "-------------------" << std::endl;
         }
 
-        ~CrossingStation () override // Кажется, тут что-то должно быть по другому
-        {
-            m_CrossList.clear();
-        }
+        ~CrossingStation () override {}// Кажется, тут что-то должно быть по другому
+
 };
 
 
