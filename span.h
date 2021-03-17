@@ -7,8 +7,11 @@
 
 #ifndef RAILWAY_SPAN_H
 #define RAILWAY_SPAN_H
-#include "station.h"
+
+#include <string>
 #include <cassert>
+
+class Station;
 
 class Span {
 private:

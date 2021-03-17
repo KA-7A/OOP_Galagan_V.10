@@ -12,6 +12,8 @@
 #include <iostream>
 #include "span.h"
 
+class Span;
+
 class Station{
 private:
     int m_number;               // Номер станции, имеет вид (№ветки * 1000 + №станции)
@@ -20,7 +22,7 @@ private:
     Station *m_next, *m_prev;   // Указатели на соседние станции. Ну потому что по ТЗ это д.б. связанный список. Если что-то нулл, то это конечная
     Span m_left, m_right;       // Перегоны до соседних станций. Надо использовать указатели. Исправить.
 public:
-    Station(void)   // Дефолтный конструктор
+    Station()   // Дефолтный конструктор
     {
         m_number     = 0;
         m_av_traffic = 0;
@@ -75,10 +77,10 @@ public:
     inline virtual bool isCrossing()    const { return false;          }
 
 // #### Получаем информацию о соседях станции ### //
-    inline const std::string& getLeftName()   const { if (m_prev) return m_prev->getName(); else return ""; }
-    inline const std::string& getRightName()  const { if (m_next) return m_next->getName(); else return ""; }
-    inline Station * getLeftAddr()     const { return m_prev; }
-    inline Station * getRightAddr()    const { return m_next; }
+    inline const std::string& getLeftName()   const { if (m_prev!= nullptr) return m_prev->getName();}// else return " "; }
+    inline const std::string& getRightName()  const { if (m_next!= nullptr) return m_next->getName();}// else return " "; }
+    inline Station * getLeftAddr()     const { if (m_prev!= nullptr) return m_prev; else return nullptr; }
+    inline Station * getRightAddr()    const { if (m_next!= nullptr) return m_next; else return nullptr; }
     inline double getTimeToLeft_min()  const { return m_left.getTime_min() ; }
     inline double getTimeToLeft_max()  const { return m_left.getTime_max() ; }
     inline double getTimeToRight_min() const { return m_right.getTime_min(); }
