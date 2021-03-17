@@ -9,7 +9,10 @@
 #define RAILWAY_STATION_H
 #include <string>
 #include <utility>
+#include <iostream>
 #include "span.h"
+
+class Span;
 
 class Station{
 private:
@@ -17,23 +20,19 @@ private:
     int m_av_traffic;           // Значение среднего траффика
     std::string m_name;         // Имя станции
     Station *m_next, *m_prev;   // Указатели на соседние станции. Ну потому что по ТЗ это д.б. связанный список. Если что-то нулл, то это конечная
-            Span m_left, m_right;       // Перегоны до соседних станций. Надо использовать указатели. Исправить.
-            bool m_isRegular;           // true -- станция обычная, false -- пересадочная. ( Костыль, надо переделать )
+    Span m_left, m_right;       // Перегоны до соседних станций. Надо использовать указатели. Исправить.
 public:
-    Station(void)   // Дефолтный конструктор
+    Station()   // Дефолтный конструктор
     {
         m_number     = 0;
         m_av_traffic = 0;
         m_name = "Unnamed";
         m_next = m_prev = nullptr;
-        m_isRegular  = true;     // По дефолту все станции у нас сначала обычные
     }
-    //
     Station(int number, int av_traffic, std::string name) {
         m_number = number;
         m_av_traffic = av_traffic;
         m_name = name;
-        m_isRegular = true;
         m_next = nullptr;
         m_prev = nullptr;
     }
@@ -49,12 +48,12 @@ public:
     inline void leftConnect (Station *prev, Span &left)    { m_prev = prev ; m_left  = left;  }
 
     // ## Меняем кое-какие показатели ## //
-    inline void changeToType (bool type)        { m_isRegular = type;         }
-    inline void changeTraffic(int new_traffic)  { m_av_traffic = new_traffic; }
+    inline void setTraffic   (int traffic)      { m_av_traffic = traffic; }
+    inline void setName      (std::string name) { m_name   = name;        }
+    inline void setNumber    (int number)       { m_number = number;      }
 
     // ## Выдаем всю информацию о станции на печать ## //
-    virtual // <-- Это ключевое слово поставила IDE, когда я попробовал перегрузить этот метод для дочернего класса
-    void printFullInfo()  const {
+    virtual void printFullInfo()  const {
         std::cout << "_________________________" << std::endl;
         std::cout << "| name: "         << m_name       << std::endl <<
                      "| num : "         << m_number     << std::endl <<
@@ -72,16 +71,16 @@ public:
     }
 
 // #### Получаем информацию о самой станции #### //
-    inline int  getNumber()      const { return m_number;       }
-    inline int  getTraffic()     const { return m_av_traffic;   }
-    inline std::string getName() const { return m_name;         }
-    inline bool isCrossing()     const { return (!m_isRegular); }
+    inline int getNumber()              const { return m_number;       }
+    inline int getTraffic()             const { return m_av_traffic;   }
+    inline const std::string& getName() const { return m_name;         }
+    inline virtual bool isCrossing()    const { return false;          }
 
 // #### Получаем информацию о соседях станции ### //
-    inline std::string getLeftName()   const { return m_prev->getName(); }
-    inline std::string getRightName()  const { return m_next->getName(); }
-    inline Station * getLeftAddr()     const { return m_prev; }
-    inline Station * getRightAddr()    const { return m_next; }
+    inline const std::string& getLeftName()   const { if (m_prev!= nullptr) return m_prev->getName();}// else return " "; }
+    inline const std::string& getRightName()  const { if (m_next!= nullptr) return m_next->getName();}// else return " "; }
+    inline Station * getLeftAddr()     const { if (m_prev!= nullptr) return m_prev; else return nullptr; }
+    inline Station * getRightAddr()    const { if (m_next!= nullptr) return m_next; else return nullptr; }
     inline double getTimeToLeft_min()  const { return m_left.getTime_min() ; }
     inline double getTimeToLeft_max()  const { return m_left.getTime_max() ; }
     inline double getTimeToRight_min() const { return m_right.getTime_min(); }

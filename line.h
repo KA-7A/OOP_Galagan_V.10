@@ -51,11 +51,12 @@ public:
     }
 
 // ## Надо будет поменять названия, потому что они слегка не соответствуют тому, что должны делать ## //
-    inline void addStationToLine(Station* S)         { m_line.push_back(S); }
-    inline void addStationToLine(CrossingStation* S) { m_line.push_back(S); }
+    inline void addStationToLine(Station* S){ m_line.push_back(S);      }
+
 // ## Меняем кое-что внутри нашей ветки
     inline void writeName(std::string name) { m_name = std::move(name); }
     inline void spanPushBack(const Span& s) { m_spansList.push_back(s); }
+
 // ## Получаем на выход информацию о станции
     std::string getName() const{ return m_name; }
     void printFullAllStationsInfo_list()  const{
@@ -201,6 +202,12 @@ public:
             }
         }
         return time_max;
+    }
+    Station* findStationByName(std::string name)  // Функция, которая проверяет, есть ли станция с указанным именем в ветке
+    {
+        for (Station *cur = m_head; cur != nullptr; cur = cur ->getRightAddr())
+            if (cur->getName() == name) return cur;
+        return nullptr;
     }
 
     ~Line()

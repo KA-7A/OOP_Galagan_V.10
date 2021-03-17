@@ -7,8 +7,11 @@
 
 #ifndef RAILWAY_SPAN_H
 #define RAILWAY_SPAN_H
-#include "station.h"
+
+#include <string>
 #include <cassert>
+
+class Station;
 
 class Span {
 private:
@@ -20,21 +23,21 @@ public:
     }
     Span(const char* S1, const char* S2, double minTime, double maxTime){
         if (minTime > maxTime) {
-            std::cout << "Incorrect input: minTime > maxTime! I'll swap it" << std::endl;
             m_minTime = maxTime;
             m_maxTime = minTime;
         } else {
             m_minTime = minTime;
             m_maxTime = maxTime;
         }
+        if (minTime < 0) m_minTime = 0;
+        if (maxTime < 0) m_maxTime = 0;
         m_left_st = S1;
         m_right_st = S2;
     }
     Span(const char* S1, const char* S2, double time)   // Конструктор, который использовался в самом начале на этапе отладки
     {
-        if (time == 0) {
+        if (time == 0)
             m_maxTime = m_minTime = 0;
-        }
         else
         {
             m_minTime = time;
@@ -44,8 +47,8 @@ public:
         m_right_st = S2;
     }
 // ## Получем имена соседних станций
-    inline std::string getLeft()  const { return m_left_st; }
-    inline std::string getRight() const { return m_right_st; }
+    inline const std::string& getLeft()  const { return m_left_st; }
+    inline const std::string& getRight() const { return m_right_st; }
 // ## Получаем время, за которое можно пересечь этот перегон
     inline double getTime_min() const   { return m_minTime; }
     inline double getTime_max() const   { return m_maxTime; }

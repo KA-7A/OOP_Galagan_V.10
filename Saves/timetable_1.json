@@ -1,0 +1,29 @@
+{
+  "timetable": [
+    {
+      "time": 0,
+      "name": "Moskva Savelovskaya"
+    },
+    {
+      "time": 4,
+      "name": "Timiryazevskaya"
+    },
+    {
+      "time": 7,
+      "name": "Okruzhnaya"
+    },
+    {
+      "time": 10,
+      "name": "Degunino"
+    },
+    {
+      "time": 14,
+      "name": "Beskudnikovo"
+    },
+    {
+      "time": 18,
+      "name": "Lianozovo"
+
+    }
+  ]
+}
