@@ -77,8 +77,12 @@ public:
     inline virtual bool isCrossing()    const { return false;          }
 
 // #### Получаем информацию о соседях станции ### //
-    inline const std::string& getLeftName()   const { if (m_prev!= nullptr) return m_prev->getName();}// else return " "; }
-    inline const std::string& getRightName()  const { if (m_next!= nullptr) return m_next->getName();}// else return " "; }
+    inline const std::string getLeftName()   const { if (m_prev!= nullptr) return m_prev->getName(); else return nullptr; }
+    inline const std::string getRightName()  const { if (m_next!= nullptr) return m_next->getName(); else return nullptr; }
+    /*
+     * Убрали тут возвращение по ссылке потому что компилятор ругается, что в случае else у нас возвращается
+     * временный объект. И он прав, оставлю пока вот так.
+     */
     inline Station * getLeftAddr()     const { if (m_prev!= nullptr) return m_prev; else return nullptr; }
     inline Station * getRightAddr()    const { if (m_next!= nullptr) return m_next; else return nullptr; }
     inline double getTimeToLeft_min()  const { return m_left.getTime_min() ; }

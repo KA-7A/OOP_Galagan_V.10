@@ -1,10 +1,10 @@
 //
 // Created by Администратор on 12.03.2021.
 //
-
+/*
 #ifndef RAILWAY_GETLINES
 #define RAILWAY_GETLINES
-
+*/
 
 #include <vector>
 #include "line.h"
@@ -122,4 +122,4 @@ std::vector<Line*> getLines(const char *filename, std::vector<Line*> Lines)  // 
     return Lines;
 }
 
-#endif
+//#endif

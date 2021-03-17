@@ -2,15 +2,15 @@
     "timetable": [
         {
             "time": 0,
-            "name": "Okruzhnaya"
+            "name": "Moskva Teatralnaya"
         },
         {
             "time": 4,
-            "name": "Timiryazevskaya"
+            "name": "Komsomolskaya"
         },
         {
-            "time": 8,
-            "name": "Moskva Savelovskaya"
+            "time": 7,
+            "name": "MCC"
         }
     ]
 }

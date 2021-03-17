@@ -6,8 +6,8 @@
  * оценивать корректность графика, сформировав человекочитаемый список найденных в нём ошибок.
  */
 
-#ifndef OOP_2_TIMATABLE_H
-#define OOP_2_TIMATABLE_H
+#ifndef OOP_2_TIMETABLE_H
+#define OOP_2_TIMETABLE_H
 
 
 #include <map>
@@ -34,30 +34,7 @@ private:
 public:
     Timetable(){};
     // Метод, заполняющий наш вектор из файла
-    void getTimetableFromFile(const char *filename) {
-        m_timetable.clear();
-        FILE *source = fopen(filename, "r");
-        assert(source);
-        char readBuffer[65536];
-        FileReadStream is(source, readBuffer, sizeof (readBuffer));
-        Document timetableObj;
-        timetableObj.ParseStream(is);
-        fclose(source);
-
-        assert(timetableObj.IsObject());
-        assert(timetableObj.HasMember("timetable") && timetableObj["timetable"].Size() >0);
-        //const Value& stop = timetableObj["timetable"][0];
-        for (unsigned int i = 0; i < timetableObj["timetable"].Size(); i++)
-        {
-            assert(timetableObj["timetable"][i].IsObject());
-            const Value& stop = timetableObj["timetable"][i];
-            assert(stop.HasMember("name") && stop["name"].IsString());
-            assert(stop.HasMember("time") && (stop["time"].IsDouble() || stop["time"].IsInt()));
-            assert(stop["time"].GetDouble() >= 0);
-            m_timetable.emplace_back(stop["time"].GetInt(), stop["name"].GetString());
-
-        }
-    };
+    void getTimetableFromFile(const char *filename);
     void printTimetable() const {
         int ind = 0;
         printf("  № | time | Station \n");
@@ -80,4 +57,4 @@ public:
 };
 
 
-#endif //OOP_2_TIMATABLE_H
+#endif //OOP_2_TIMETABLE_H

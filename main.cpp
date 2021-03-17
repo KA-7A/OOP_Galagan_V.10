@@ -1,7 +1,6 @@
 #include "station.h"
 #include "line.h"
 #include "Menu.h"
-#include "getlines.cpp"
 
 std::vector<Line*> getLines(const char *filename, std::vector<Line*> Lines); // Эта функция будет доставать из файла информацию о линии. Надо запилить еще миллион проверок
 
