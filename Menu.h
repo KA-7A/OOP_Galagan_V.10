@@ -107,13 +107,11 @@ public:
                 break;
             }
             case -1: {
-                std::cout << " Error: Station(s) with such name(s) was(were) not found in line " << std::endl
-                          << std::endl;
+                std::cout << " Error: Station(s) with such name(s) was(were) not found in line " << std::endl << std::endl;
                 break;
             }
             case -2: {
-                std::cout << " Error: Train changes the direction/ missed the station in line" << std::endl
-                          << std::endl;
+                std::cout << " Error: Train reached the end of line but not the route!" << std::endl << std::endl;
                 break;
             }
             case -3: {
@@ -131,7 +129,7 @@ public:
             }
             case -6:
             {
-                std::cout << " I donnaw wassup \n\n";
+                std::cout << " Error: Train missed the station/ changed the direction/ try to reach the unknown station \n\n";
                 break;
             }
             default: {
@@ -143,7 +141,7 @@ public:
 
     void test_Timetable(std::vector<Line*> linesList)
     {
-        for (int i = 1; i <= 7; i++)
+        for (int i = 1; i <= 8; i++)
         {
             Timetable t;
             std::string filename = "./Saves/timetable_" + std::to_string(i) + ".json";

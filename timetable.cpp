@@ -7,51 +7,62 @@
 int Timetable::checkTimetable(std::vector<Line *> lines) {
     if (m_timetable.empty())        return -4;  // Если расписание совсем пустое
     if (m_timetable.size() == 1)    return -5;  // Если расписание состоит всего из одного пункта
-    int it = 0;
-    Station *res = nullptr;
+    auto it = m_timetable.begin();
+    Station *cur = nullptr;
     for (int i = 0; i < lines.size(); i++) { // Ищем станцию в каждой ветке
-        res = lines[i]->findStationByName(m_timetable[0].second);
-        if (res)    // Если нашли
+        cur = lines[i]->findStationByName(m_timetable[0].second);
+        if (cur)    // Если нашли
             break;  // Выходим из цикла
     }
-    if (!res) return -1; // Проверяем, что станция нашлась. Если станции с таким именем нет ни в одно из веток, выходим
+    if (!cur) return -1; // Проверяем, что станция нашлась. Если станции с таким именем нет ни в одно из веток, выходим
     /*
      * Че вообще внизу происходит:
      * Мы нашли стартовую станцию в нашем маршруте (res)
      * Дальше пытаемся определить направление движения поезда
      * Если он поехал вправо, то должен доехать до самого конца своего маршрута, ничего не пропуская
+     *
+     * cur -- указатель в векторе - линии
+     * it  -- итератор  в векторе - расписании
      */
-    //it++;   //              |Проверяем, что поехал вправо Проверяем, что поехал вправо|
-
-    if (res->getRightAddr() && res->getRightName() == m_timetable[1].second){
-        while (res != nullptr && res->getRightAddr() && it+1 < m_timetable.size() && res->getRightName() == m_timetable[it+1].second && it < m_timetable.size() ) {
-            // Ошибка, если поезд слишком много/мало времени проводит на перегоне
-            if (res->getRightSpan().getTime_min() > abs(m_timetable[it].first - m_timetable[it+1].first) ||
-                res->getRightSpan().getTime_max() < abs(m_timetable[it].first - m_timetable[it+1].first) )
-                return -3;
-            res = res->getRightAddr();
+    //it++;
+    // Если поезд мог поехать направо И поехал направо
+    if (cur->getRightAddr() && cur->getRightName() == m_timetable[1].second){
+        while (it != m_timetable.end())  // Пока не доберемся до конца маршрута
+        {
+            auto tmp = it;
+            tmp++;
+            if (tmp != m_timetable.end()) {  // Проверяем время переезда
+                // Ошибка, если поезд слишком много/мало времени проводит на перегоне
+                if (it->second != cur->getName() || tmp->second != cur->getRightName()) return -6;
+                if (cur->getRightSpan().getTime_min() > abs(tmp->first - it->first) ||
+                    cur->getRightSpan().getTime_max() < abs(tmp->first - it->first))
+                    return -3;
+            }
+            if (!(cur->getRightAddr()) && tmp != m_timetable.end()) return -2;  // Доехали до конца ветки но не до конца маршрута
+            cur = cur->getRightAddr();
             it++;
         }
-        // Это значит, что поезд доехал до конца маршрута И не вышел за пределы ветки
-        if (!res) return -2;                            // Вышли за границу ветки и не дошли до конца маршрута
-        // 36 строка не уверен, что оно реально так должно быть.
-        if ((it + 1) == m_timetable.size()) return 0;
-            // Это значит, что поезд сдвинулся в вправо, но не доехал до конца маршрута/ он попал за границы ветки
-        else if (it !=0) return -2;
+        return 0;
     }
-    else if (res->getLeftAddr() && res->getLeftName() == m_timetable[1].second) { // Иначе если поезд сразу поехал налево
-        while (res != nullptr && res->getLeftAddr() && it+1 < m_timetable.size() &&res->getLeftName() == m_timetable[it+1].second) {
-            // Ошибка, если поезд слишком много/мало времени проводит на перегоне
-            if (res->getRightSpan().getTime_min() > abs(m_timetable[it].first - m_timetable[it + 1].first) ||
-                res->getRightSpan().getTime_max() < abs(m_timetable[it].first - m_timetable[it + 1].first))
-                return -3;
-            res = res->getLeftAddr();
+    else if (cur->getLeftAddr() && cur->getLeftName() == m_timetable[1].second){
+        while (it != m_timetable.end())  // Пока не доберемся до конца маршрута
+        {
+            auto tmp = it;
+            tmp++;
+            if (tmp != m_timetable.end()) {  // Проверяем время переезда
+                // Ошибка, если поезд слишком много/мало времени проводит на перегоне
+                if (it->second != cur->getName() || tmp->second != cur->getLeftName()) return -6;
+                if (cur->getLeftSpan().getTime_min() > abs(tmp->first - it->first) ||
+                    cur->getLeftSpan().getTime_max() < abs(tmp->first - it->first))
+                    return -3;
+            }
+            if (!(cur->getLeftAddr()) && tmp != m_timetable.end()) return -2;  // Доехали до конца ветки но не до конца маршрута
+            cur = cur->getLeftAddr();
             it++;
         }
-        if (it == m_timetable.size() && res) return 0;    // Аналогично, если он доехал до конца без происшествий, то ОК
-        else return -2;  // Если нет, то в расписании бред и поезд пытается ехать по какой-то неправильной ветке.
+        return 0;
     }
-    else return -6;
+    return -6;
 }
 
 
