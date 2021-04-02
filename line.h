@@ -32,15 +32,15 @@ using namespace rapidjson;
 
 class Line {
 private:
-    std::vector<Station*> m_line;   // Собственно, вектор, в котором будет храниться наш двусвязный список
-    std::vector<Span> m_spansList;  // Сделаем такую вот штуку, чтобы гарантированно сохранить все перегоны (чтобы ничто нигде не затерлось)
-    Station *m_head, *m_tail;       // Указатели на начало и конец ветки.. (необходимый двусвязный список)
+    std::vector<Station*> m_Stations;   // Собственно, вектор, в котором будет храниться наш двусвязный список
+    std::vector<Span>     m_Spans;      // Сделаем такую вот штуку, чтобы гарантированно сохранить все перегоны (чтобы ничто нигде не затерлось)
+    Station *m_head, *m_tail;           // Указатели на начало и конец ветки.. (необходимый двусвязный список)
     std::string m_name;
 
     int checkLine() const {
         int counter = 0;
-        for (int i = 0; i < m_line.size(); i++)
-            if (m_line[i]->getRightAddr() == nullptr || m_line[i]->getLeftAddr() == nullptr)
+        for (int i = 0; i < m_Stations.size(); i++)
+            if (m_Stations[i]->getRightAddr() == nullptr || m_Stations[i]->getLeftAddr() == nullptr)
                 counter++;
         return counter;
     }
@@ -51,11 +51,11 @@ public:
     }
 
 // ## Надо будет поменять названия, потому что они слегка не соответствуют тому, что должны делать ## //
-    inline void addStationToLine(Station* S){ m_line.push_back(S);      }
+    virtual inline void addStationToLine(Station* S){ m_Stations.push_back(S);      }
 
 // ## Меняем кое-что внутри нашей ветки
     inline void writeName(std::string name) { m_name = std::move(name); }
-    inline void spanPushBack(const Span& s) { m_spansList.push_back(s); }
+    inline void spanPushBack(const Span& s) { m_Spans.push_back(s); }
 
 // ## Получаем на выход информацию о станции
     std::string getName() const{ return m_name; }
@@ -76,7 +76,7 @@ public:
         }
     }
 // ## Метод связывания вектора в связный список
-    void connectLine();
+    virtual void connectLine();
 
 // ## Методы с расчетом максимального/ минималььного времени
     double calculateTravelTime_min (int n1, int n2) const;
@@ -90,9 +90,16 @@ public:
 
     ~Line()
     {
-        for (int i = m_line.size(); i >=0 ; i--)
-            delete m_line[i];
+        for (int i = m_Stations.size(); i >=0 ; i--)
+            delete m_Stations[i];
     }
+
+};
+
+class S_Line: public Line {
+private:
+    // А тут как бы нечему храниться. Разница в том, что внутри m_Stations будет лежать S_Stations
+public:
 
 };
 

@@ -10,6 +10,7 @@
 #include <string>
 #include <utility>
 #include <iostream>
+#include <ctime>
 #include "span.h"
 
 class Span;
@@ -97,5 +98,48 @@ public:
     bool operator<  (const Station &S2) const { return (m_number < S2.m_number) ; }
 
     virtual ~Station(){}
+};
+
+typedef struct neighbour
+{
+    Station *St;
+    double minTime, maxTime;
+} neighbour;
+
+class S_Station: public Station
+{
+private:
+    std::vector<neighbour> m_leftDir, m_rightDir;
+    int m_maxLayer;
+    int MAX = 4;
+public:
+    S_Station()
+    {
+        std::srand(std::time(nullptr));
+        m_maxLayer = std::rand() % MAX;
+    }
+// ! Важно ! Если соединяется нулевой слой, то было бы неплохо вызвать и классический right/left connect
+    int rightLayerConnect(int layerNum, Station *St, double minTime, double maxTime)
+    {
+        if (layerNum > MAX)                return -1;
+        if (layerNum > m_rightDir.size())  return -2;
+        neighbour tmp;
+        tmp.St = St;
+        tmp.minTime = minTime;
+        tmp.maxTime = maxTime;
+        m_rightDir.push_back(tmp);
+    }
+    int leftLayerConnect (int layerNum, Station *St, double minTime, double maxTime)
+    {
+        if (layerNum > MAX)                return -1;
+        if (layerNum > m_leftDir.size())   return -2;
+        neighbour tmp;
+        tmp.St = St;
+        tmp.minTime = minTime;
+        tmp.maxTime = maxTime;
+        m_leftDir.push_back(tmp);
+    }
+
+    ~S_Station() {}
 };
 #endif //RAILWAY_STATION_H
