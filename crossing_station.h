@@ -35,7 +35,7 @@ class CrossingStation : public Station {
             if (getLeftAddr() ) std::cout << "| l:" << getLeftName()  << std::endl;
             if (getRightAddr()) std::cout << "| r:" << getRightName() << std::endl;
             std::cout << "| | Cross to: " << std::endl;
-            for (int i = 0; i < m_CrossList.size(); i++)
+            for (unsigned int i = 0; i < m_CrossList.size(); i++)
                 std::cout << "| | "<< i << ". " << m_CrossList[i] <<";" << std::endl;
             std::cout  << "|________________________"  << std::endl;
         }

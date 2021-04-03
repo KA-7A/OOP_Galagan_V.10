@@ -9,7 +9,7 @@ int Timetable::checkTimetable(std::vector<Line *> lines) {
     if (m_timetable.size() == 1)    return -5;  // Если расписание состоит всего из одного пункта
     auto it = m_timetable.begin();
     Station *cur = nullptr;
-    for (int i = 0; i < lines.size(); i++) { // Ищем станцию в каждой ветке
+    for (unsigned int i = 0; i < lines.size(); i++) { // Ищем станцию в каждой ветке
         cur = lines[i]->findStationByName(m_timetable[0].second);
         if (cur)    // Если нашли
             break;  // Выходим из цикла

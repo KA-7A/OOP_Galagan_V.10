@@ -1,1 +1,1 @@
-g++ main.cpp Menu.cpp timetable.cpp getlines.cpp line.cpp && ./a.out
+g++ -o result.out -Wall -Wextra -g -O0 main.cpp Menu.cpp timetable.cpp getlines.cpp line.cpp && echo

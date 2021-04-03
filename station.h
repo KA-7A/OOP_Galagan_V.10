@@ -8,6 +8,10 @@
 #ifndef RAILWAY_STATION_H
 #define RAILWAY_STATION_H
 #include <string>
+#include <vector>
+#include <list>
+#include <ctime>
+#include <cmath>
 #include <utility>
 #include <iostream>
 #include "span.h"
@@ -48,9 +52,9 @@ public:
     inline void leftConnect (Station *prev, Span &left)    { m_prev = prev ; m_left  = left;  }
 
     // ## Меняем кое-какие показатели ## //
-    inline void setTraffic   (int traffic)      { m_av_traffic = traffic; }
-    inline void setName      (std::string name) { m_name   = name;        }
-    inline void setNumber    (int number)       { m_number = number;      }
+    inline void setTraffic   (int traffic)      { m_av_traffic = traffic;     }
+    inline void setName      (std::string name) { m_name   = std::move(name); }
+    inline void setNumber    (int number)       { m_number = number;          }
 
     // ## Выдаем всю информацию о станции на печать ## //
     virtual void printFullInfo()  const {
@@ -64,7 +68,7 @@ public:
         if (getRightAddr()) std::cout << "| r:" << getRightName() << std::endl;
         std::cout  << "|________________________"  << std::endl;
     }
-    void printShortInfo() const {
+    void printShortInfo()         const {
         std::cout << "|---------------------------" << std::endl;
         std::cout << "| name: " << m_name   << std::endl <<
                      "| num : " << m_number << std::endl;
@@ -94,8 +98,80 @@ public:
     inline Span getRightSpan() const { return m_right; }
 // #### Перегружаем операторы ##### //
     bool operator== (const Station &S2) const { return (m_number == S2.m_number); }
-    bool operator<  (const Station &S2) const { return (m_number < S2.m_number) ; }
+    bool operator<  (const Station &S2) const { return (m_number <  S2.m_number); }
 
+
+    virtual int rightLayerConnect(int layer, Station *St, double minTime, double maxTime) { return 0 };
+    virtual int leftLayerConnect (int layer, Station *St, double minTime, double maxTime) { return 0 };
+    virtual int getSize() const { return  0 };
     virtual ~Station(){}
+};
+
+typedef struct neighbour {
+    Station *St;
+    double minTime, maxTime;
+} neighbour;
+
+class S_Station: public Station{
+private:
+    std::vector<neighbour*> m_leftDir, m_rightDir;
+    int m_size;
+    static const int maxSize = 4;
+public:
+    S_Station()
+    {
+        std::srand(std::time(nullptr));
+        double tmp = (std::rand() % 1000) / 1000.;
+        int i;
+        for (i = 1; i < maxSize; i++ )
+            if (tmp > 1. / pow(2, i) )
+                break;
+        std::cout << "tmp" << tmp << "; Size " << i << std::endl;
+        m_size = i;
+    }
+    S_Station(int seed)
+    {
+
+        std::srand(std::time(nullptr)+seed);
+        double tmp = (std::rand() % 1000) / 1000.;
+        int i;
+        for (i = 1; i < maxSize; i++ )
+            if (tmp > 1. / pow(2, i) )
+                break;
+        std::cout << "tmp" << tmp << "; Size " << i << std::endl;
+        m_size = i;
+    }
+
+    int getSize() const { return m_size; }
+    int leftLayerConnect(int layer, Station *St, double minTime, double maxTime)
+    {
+        if (layer >= m_size)                            return -1;
+        if ((unsigned int)layer != m_leftDir.size())  return -2;
+        auto tmp = new neighbour;
+        tmp->St = St;
+        tmp->minTime = minTime;
+        tmp->maxTime = maxTime;
+        m_leftDir.push_back(tmp);
+        return 0;
+    }
+    int rightLayerConnect(int layer, Station *St, double minTime, double maxTime){
+        if (layer >= m_size)                            return -1;
+        if ((unsigned int)layer != m_rightDir.size()) return -2;
+        auto tmp = new neighbour;
+        tmp->St = St;
+        tmp->minTime = minTime;
+        tmp->maxTime = maxTime;
+        m_rightDir.push_back(tmp);
+        return 0;
+    }
+    ~S_Station()
+    {
+        for (auto & i : m_leftDir)
+            delete i;
+        for (unsigned int i = 0; i < m_rightDir.size(); i++)
+            delete m_rightDir[i];
+        // Оставил две разные конструкции по смыслу одинаковые просто чтобы привыкнуть к ним побольше
+    }
+
 };
 #endif //RAILWAY_STATION_H
