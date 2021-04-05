@@ -8,41 +8,39 @@ void Line::connectLine() // Супер наивный алгоритм. Наве
 {
     //std::sort(m_line.begin(), m_line.end(), [] (const Station* S1, const Station* S2) -> bool { return (*S1 < *S2); });
     std::vector<Span> Sp = m_spansList;
-    //std::vector<Station*> St = m_line;
-    for (long unsigned int i = 0; i < m_line.size(); i++)
+    for (auto cur_Station = m_line.begin(); cur_Station != m_line.end(); cur_Station++)   // Каждую станцию надо связать
     {
-        Station curSt = *m_line[i];
-        const std::string& st_name = curSt.getName();
-        for (unsigned int j = 0; j < Sp.size(); j++) {
-            Span curSp = Sp[j];
-            std::string left = curSp.getLeft(), right = curSp.getRight();
-            if (left == st_name && left!=right)
-                for (long unsigned int k = 0; k < m_line.size(); k++)
-                    if (m_line[k]->getName() == right)
+        const std::string& st_name = (*cur_Station)->getName();                       // Получаем имя станции (в той же цели)
+        for (auto cur_Span = m_spansList.begin(); cur_Span != m_spansList.end(); cur_Span++) { // Проходим по вектору перегонов
+            std::string left =  (*cur_Span).getLeft();
+            std::string right = cur_Span->getRight(); // Получим имена правой и левой станции перегона
+            if (left == st_name && left!=right)                             // Если имя станции совпадает с левым краем
+                for (auto test_Station = m_line.begin(); test_Station != m_line.end(); test_Station++)       // Ищем правый конец этого перегона (не знаем заведомо, где он)
+                    if ((*test_Station)->getName() == right)                           // Нашли?
                     {
-                        m_line[i]->rightConnect(m_line[k],m_spansList[j]);
+                        (*cur_Station)->rightConnect(*test_Station, *cur_Span);   // Соединяем это дело
                         break;
                     }
-
-            if (right == st_name && left!=right)
-                for (long unsigned int k = 0; k < m_line.size(); k++)
-                    if (m_line[k]->getName() == left)
+            if (right == st_name && left!=right)                                       // Аналогично в обратную сторону
+                for (auto test_Station = m_line.begin(); test_Station != m_line.end(); test_Station++)
+                    if ((*test_Station)->getName() == left)
                     {
-                        m_line[i]->leftConnect(m_line[k],m_spansList[j]);
+                        (*cur_Station)->leftConnect(*test_Station, *cur_Span);
                         break;
                     }
         }
     }
     assert(checkLine() == 2);   // Проверка на случай, если у нас не хватает слишком большого количества перегонов
 
+    // Определяем голову и хвост линии
     for (unsigned int i = 0; i < m_line.size(); i++) // Цикл не меняю на модную конструкцию, которую предлагает IDE, потому что к ней не привык
-        if (m_line[i]->getLeftAddr() == nullptr) // Гарантированно получаем левый конец ветки
+        if (m_line[i]->getLeftAddr() == nullptr)     // Гарантированно получаем левый конец ветки
         {
             m_head = m_line[i];
             break;
         }
     for (unsigned int i = 0; i < m_line.size(); i++) // Вообще такой вот способ мне не очень нравится, тут вроде нужны итераторы
-        if (m_line[i]->getRightAddr() == nullptr) // Гарантированно получаем правый конец ветки
+        if (m_line[i]->getRightAddr() == nullptr)    // Гарантированно получаем правый конец ветки
         {
             m_tail = m_line[i];
             break;

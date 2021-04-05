@@ -2,12 +2,16 @@
 #include "line.h"
 #include "Menu.h"
 
-std::vector<Line*> getLines(const char *filename, std::vector<Line*> Lines); // Эта функция будет доставать из файла информацию о линии. Надо запилить еще миллион проверок
+#define SKIP_LIST 1
+#define LNKD_LIST 0
+
+std::vector<Line *> getLines(const char *filename, std::vector<Line*> Lines, int mode);
+// Эта функция будет доставать из файла информацию о линии. Надо запилить еще миллион проверок
 
 int main() {
     std::vector<Line*> Lines;
-    Lines = getLines("./Saves/State.json", Lines);
-    Menu Menu(Lines);  // Возможно можно обойтись 1 переменной, мб - двумя. Просто хз как работает вектор
+    Lines = getLines("./Saves/State.json", Lines, SKIP_LIST);
+    Menu Menu(Lines);
     for(unsigned int i = 0; i < Lines.size(); i++)
         delete Lines[i];
     return 0;

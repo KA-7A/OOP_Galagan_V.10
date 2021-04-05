@@ -16,11 +16,11 @@ class Menu {
 private:
     std::vector<Line*> Lines;
 public:
-    Menu (std::vector<Line*> linesList) // Это надо запихнуть в отдельную функцию и спрятать в отдельный файл. Не понимаю, как.
+    Menu (const std::vector<Line*>& linesList) // Это надо запихнуть в отдельную функцию и спрятать в отдельный файл. Не понимаю, как.
     {
-        callMenu(std::move(linesList));
+        callMenu(linesList);
     }
-    void callMenu(std::vector<Line*> linesList);
+    void callMenu(const std::vector<Line*>& linesList);
     int drawStations(int mode) const ;
     static void drawMainMenu();
     static void printResult(int res);

@@ -101,10 +101,11 @@ public:
     bool operator<  (const Station &S2) const { return (m_number <  S2.m_number); }
 
 
-    virtual int rightLayerConnect(int layer, Station *St, double minTime, double maxTime) { return 0 };
-    virtual int leftLayerConnect (int layer, Station *St, double minTime, double maxTime) { return 0 };
-    virtual int getSize() const { return  0 };
-    virtual ~Station(){}
+    virtual int rightLayerConnect(int layer, Station *St, double minTime, double maxTime) { return 0; }
+    virtual int leftLayerConnect (int layer, Station *St, double minTime, double maxTime) { return 0; }
+    virtual int getSize() { return 0; }
+
+    virtual ~Station()= default;
 };
 
 typedef struct neighbour {
@@ -129,7 +130,7 @@ public:
         std::cout << "tmp" << tmp << "; Size " << i << std::endl;
         m_size = i;
     }
-    S_Station(int seed)
+    /*explicit (?) */  S_Station(int seed)
     {
 
         std::srand(std::time(nullptr)+seed);
@@ -142,8 +143,8 @@ public:
         m_size = i;
     }
 
-    int getSize() const { return m_size; }
-    int leftLayerConnect(int layer, Station *St, double minTime, double maxTime)
+    int getSize() override { return m_size; }
+    int leftLayerConnect(int layer, Station *St, double minTime, double maxTime) override
     {
         if (layer >= m_size)                            return -1;
         if ((unsigned int)layer != m_leftDir.size())  return -2;
@@ -154,7 +155,8 @@ public:
         m_leftDir.push_back(tmp);
         return 0;
     }
-    int rightLayerConnect(int layer, Station *St, double minTime, double maxTime){
+    int rightLayerConnect(int layer, Station *St, double minTime, double maxTime) override
+    {
         if (layer >= m_size)                            return -1;
         if ((unsigned int)layer != m_rightDir.size()) return -2;
         auto tmp = new neighbour;
@@ -164,7 +166,7 @@ public:
         m_rightDir.push_back(tmp);
         return 0;
     }
-    ~S_Station()
+    ~S_Station() override
     {
         for (auto & i : m_leftDir)
             delete i;

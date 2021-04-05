@@ -10,8 +10,10 @@
 #include "line.h"
 #include "station.h"
 
+#define SKIP_LIST 1
+#define LNKD_LIST 0
 
-std::vector<Line*> getLines(const char *filename, std::vector<Line*> Lines)  // Эта функция будет доставать из файла информацию о линии. Надо запилить еще миллион проверок
+std::vector<Line*> getLines(const char *filename, std::vector<Line *> Lines, int mode)  // Эта функция будет доставать из файла информацию о линии. Надо запилить еще миллион проверок
 {
     // -- Тут идет блок с открытием файла и парсингом его в объект, с которым дальше нужно будет работать -- //
 //--- Parsing from file to object ---//
@@ -56,7 +58,10 @@ std::vector<Line*> getLines(const char *filename, std::vector<Line*> Lines)  // 
          * крч element -- это JSON одной станции следующего вида:
          * { "name" : ... , ... }
          */
-        Lines.push_back(new Line);
+        if (mode == LNKD_LIST)
+            Lines.push_back(new Line);
+        else if (mode == SKIP_LIST)
+            Lines.push_back(new S_Line);
 // ---------- Here is Spans filling block ------------------ //
         //std::cout << "lineNum == "<< i <<"; lineName is "<< lineName << ";" << std::endl;
         std::vector<Span> span_vector;

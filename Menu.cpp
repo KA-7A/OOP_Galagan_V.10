@@ -96,7 +96,7 @@ void Menu::drawMainMenu() {
     std::cout << " **********************************" << std::endl << " >> ";
 }
 
-void Menu::callMenu(std::vector<Line *> linesList) {
+void Menu::callMenu(const std::vector<Line *>& linesList) {
     Lines = linesList;
     int choice = 1;
     while (choice) {
@@ -123,9 +123,7 @@ void Menu::callMenu(std::vector<Line *> linesList) {
                 int n1, n2;
                 scanf("%d %d", &n1, &n2);
                 if ((n1 / 1000) != (lineNum + 1) || (n2 / 1000) != (lineNum + 1))
-                    std::cout << " Incorrect input: These stations do not belong to the selected line "
-                              <<
-                              std::endl;
+                    std::cout << " Incorrect input: These stations do not belong to the selected line " << std::endl;
                 else {
                     double minTime = Lines[lineNum]->calculateTravelTime_min(n1, n2);
                     double maxTime = Lines[lineNum]->calculateTravelTime_max(n1, n2);

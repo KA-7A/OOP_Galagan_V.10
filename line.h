@@ -17,6 +17,7 @@
 #include <vector>
 #include <list>
 #include <cassert>
+
 #include "span.h"
 #include "station.h"
 #include "crossing_station.h"
@@ -33,10 +34,10 @@ using namespace rapidjson;
 
 class Line {
 protected:
-    std::vector<Station*> m_line;   // Собственно, вектор, в котором будет храниться наш двусвязный список
-private:
     std::vector<Span> m_spansList;  // Сделаем такую вот штуку, чтобы гарантированно сохранить все перегоны (чтобы ничто нигде не затерлось)
+    std::vector<Station*>  m_line;  // Собственно, вектор, в котором будет храниться наш двусвязный список
     Station *m_head, *m_tail;       // Указатели на начало и конец ветки.. (необходимый двусвязный список)
+private:
     std::string m_name;
 
     int checkLine() const {
@@ -60,13 +61,6 @@ public:
         // Верхняя строчка вернет итератор на первую станцию, номер которой будет больше, чем она.
         // Тогда вставим элемент на эту позицию.
         m_line.emplace(pos, S);
-        std::cout << " --------------------------------- " << std::endl;
-        for(auto it = m_line.begin(); it!= m_line.end(); it++)
-        {
-            std::cout << (*it)->getName() << std::endl;
-            //std::cout << S->getName() << std::endl;
-        }
-        //m_line.push_back(S);
     }
 
 // ## Меняем кое-что внутри нашей ветки
@@ -77,24 +71,27 @@ public:
     std::string getName() const{ return m_name; }
     void printFullAllStationsInfo_list()  const{
         Station *head = m_head;
-        while (head != nullptr)
+        while (head != m_tail)
         {
             head ->printFullInfo();
             head = head->getRightAddr();
         }
+        head ->printFullInfo();
     }
     void printShortAllStationsInfo_list() const{
         Station *head = m_head;
-        while (head != nullptr)
+        while (head != m_tail)
         {
             head ->printShortInfo();
             head = head->getRightAddr();
         }
+        head ->printShortInfo();
     }
 // ## Метод связывания вектора в связный список
     virtual void connectLine();
 
-// ## Методы с расчетом максимального/ минималььного времени
+// ## Методы с расчетом максимального/ минималььного
+// РАБОТАЮТ С УЖЕ СВЯЗНЫМ СПИСКОМ
     double calculateTravelTime_min (int n1, int n2) const;
     double calculateTravelTime_max (int n1, int n2) const;
     Station* findStationByName(const std::string &name)  // Функция, которая проверяет, есть ли станция с указанным именем в ветке
@@ -117,9 +114,33 @@ class S_Line: public Line
 public:
     void connectLine() override
     {
+        // Боже, благослови того человека, который будет пытаться в этом разобраться
+        // UPD: Боже, благослови меня это писавшего
         for(auto i = m_line.begin(); i != m_line.end(); i++)
         {
+            // Кусок, который связывает связный список
+            auto curPos = i, prevPos = i, nextPos = i;
+            if (curPos != m_line.begin()) prevPos = i--;
+            if (curPos != m_line.end()  ) nextPos = i++;
+            if (nextPos!= m_line.end())  // Если справа не с чем связываться, то и не связываемся
+            {
+                (*curPos)->rightConnect(*nextPos,
+                                     *(std::find_if(m_spansList.begin(),
+                                                    m_spansList.end(),
+                                                    [&](const Span &Sp) {
+                                                        return (Sp.getLeft()  == (*curPos) ->getName() &&
+                                                                Sp.getRight() == (*nextPos)->getName());
+                                                    })));
+            }
+            if (i != m_line.begin())    // Если слева не с чем связываться, то и не связываемся
+            {
+                auto spanPos = std::find_if(m_spansList.begin(), m_spansList.end(),
+                                            [&](const Span& Sp) { return (Sp.getLeft() == (*prevPos)->getName()
+                                              && Sp.getRight() == (*curPos)->getName()) ;});
+                (*curPos)->leftConnect(*prevPos, *spanPos);
+            }
             // Искать вперед так можно, а вот назад придётся люто костылить
+            // Внизу кусок, который связывает скип-лист
             for (int j = 0; j < (*i)->getSize(); j++)
             {
                 auto r_pos = std::find_if(i, m_line.end(),
@@ -138,7 +159,11 @@ public:
 
             }
         }
+        m_head = *m_line.begin();
+        m_tail = *m_line.rbegin();
+
     }
+    void print() { std::cout << "Hello world " << std::endl; }
 };
 
 

@@ -12,13 +12,8 @@
 
 #include <map>
 #include <vector>
-#include "line.h"
-
-// Include JSON parser
-#include <rapidjson/document.h>
-#include <rapidjson/filereadstream.h>
-#include <rapidjson/filewritestream.h>
 #include <vector>
+#include "line.h"
 
 
 class Timetable {
