@@ -33,7 +33,7 @@
 using namespace rapidjson;
 
 class Line {
-protected:
+protected:      // Делать protected -- нехорошо, но оно нужно только для дочернего класса
     std::vector<Span> m_spansList;  // Сделаем такую вот штуку, чтобы гарантированно сохранить все перегоны (чтобы ничто нигде не затерлось)
     std::vector<Station*>  m_line;  // Собственно, вектор, в котором будет храниться наш двусвязный список
     Station *m_head, *m_tail;       // Указатели на начало и конец ветки.. (необходимый двусвязный список)
@@ -67,8 +67,6 @@ public:
     inline void writeName(std::string name) { m_name = std::move(name); }
     inline void spanPushBack(const Span& s) { m_spansList.push_back(s); }
 
-// ## Получаем на выход информацию о станции
-    std::string getName() const{ return m_name; }
     void printFullAllStationsInfo_list()  const{
         Station *head = m_head;
         while (head != m_tail)
@@ -85,8 +83,11 @@ public:
             head ->printShortInfo();
             head = head->getRightAddr();
         }
-        head ->printShortInfo();
+        head->printShortInfo();
     }
+// ## Получаем на выход информацию о станции
+    std::string getName() const   { return m_name;          }
+    Station * getEndStation()     { return *m_line.rbegin();   }
 // ## Метод связывания вектора в связный список
     virtual void connectLine();
 
@@ -94,18 +95,14 @@ public:
 // РАБОТАЮТ С УЖЕ СВЯЗНЫМ СПИСКОМ
     double calculateTravelTime_min (int n1, int n2) const;
     double calculateTravelTime_max (int n1, int n2) const;
-    Station* findStationByName(const std::string &name)  // Функция, которая проверяет, есть ли станция с указанным именем в ветке
+    Station* findStationByName(const std::string &name)  // Функция, которая возвращает станцию из списка по имени
     {
         for (Station *cur = m_head; cur != nullptr; cur = cur ->getRightAddr())
             if (cur->getName() == name) return cur;
         return nullptr;
     }
 
-    virtual ~Line()
-    {
-        for (int i = m_line.size(); i >=0 ; i--)
-            delete m_line[i];
-    }
+    virtual ~Line() = default;
 
 };
 
@@ -116,14 +113,40 @@ public:
     {
         // Боже, благослови того человека, который будет пытаться в этом разобраться
         // UPD: Боже, благослови меня это писавшего
+        // UPD2:Крч я забил писать новый код и поэтому просто скопировал старый кусок, который отвечал за связывание
+        // линии в двусвязный список. Получилось вроде норм, надо придумать, как это сделать красивее
+        for (auto cur_Station = m_line.begin(); cur_Station != m_line.end(); cur_Station++)   // Каждую станцию надо связать
+        {
+            const std::string& st_name = (*cur_Station)->getName();                           // Получаем имя станции (в той же цели)
+            for (auto cur_Span = m_spansList.begin(); cur_Span != m_spansList.end(); cur_Span++) { // Проходим по вектору перегонов
+                std::string left =  (*cur_Span).getLeft();
+                std::string right = cur_Span->getRight(); // Получим имена правой и левой станции перегона
+                if (left == st_name && left!=right)                             // Если имя станции совпадает с левым краем
+                    for (auto test_Station = m_line.begin(); test_Station != m_line.end(); test_Station++)       // Ищем правый конец этого перегона (не знаем заведомо, где он)
+                        if ((*test_Station)->getName() == right)                           // Нашли?
+                        {
+                            (*cur_Station)->rightConnect(*test_Station, *cur_Span);   // Соединяем это дело
+                            break;
+                        }
+                if (right == st_name && left!=right)                                       // Аналогично в обратную сторону
+                    for (auto test_Station = m_line.begin(); test_Station != m_line.end(); test_Station++)
+                        if ((*test_Station)->getName() == left)
+                        {
+                            (*cur_Station)->leftConnect(*test_Station, *cur_Span);
+                            break;
+                        }
+            }
+        }
         for(auto i = m_line.begin(); i != m_line.end(); i++)
         {
+            /*
             // Кусок, который связывает связный список
             auto curPos = i, prevPos = i, nextPos = i;
-            if (curPos != m_line.begin()) prevPos = i--;
-            if (curPos != m_line.end()  ) nextPos = i++;
+            if (curPos != m_line.begin()) prevPos = --i;
+            if (curPos != m_line.end()  ) nextPos = ++i;
             if (nextPos!= m_line.end())  // Если справа не с чем связываться, то и не связываемся
             {
+
                 (*curPos)->rightConnect(*nextPos,
                                      *(std::find_if(m_spansList.begin(),
                                                     m_spansList.end(),
@@ -131,6 +154,7 @@ public:
                                                         return (Sp.getLeft()  == (*curPos) ->getName() &&
                                                                 Sp.getRight() == (*nextPos)->getName());
                                                     })));
+
             }
             if (i != m_line.begin())    // Если слева не с чем связываться, то и не связываемся
             {
@@ -139,6 +163,7 @@ public:
                                               && Sp.getRight() == (*curPos)->getName()) ;});
                 (*curPos)->leftConnect(*prevPos, *spanPos);
             }
+            */
             // Искать вперед так можно, а вот назад придётся люто костылить
             // Внизу кусок, который связывает скип-лист
             for (int j = 0; j < (*i)->getSize(); j++)
@@ -159,12 +184,12 @@ public:
 
             }
         }
-        m_head = *m_line.begin();
-        m_tail = *m_line.rbegin();
-
+        m_head = *(m_line.begin() );
+        m_tail = *(m_line.rbegin());
+        std::cout << "Line \""<< this->getName() <<"\" connected!" << std::endl;
     }
-    void print() { std::cout << "Hello world " << std::endl; }
 };
+
 
 
 #endif //RAILWAY_LINE_H

@@ -14,16 +14,18 @@ class CrossingStation : public Station {
     private:
         std::vector<std::string> m_CrossList;
     public:
-        CrossingStation()   // Дефолтный конструктор
-        {
+        CrossingStation() {  // Дефолтный конструктор
             fill(0, 0, "Unnamed");
         }
         CrossingStation(int number, int av_traffic, std::string name){
             fill(number, av_traffic, name);   // Заполняем поля нужным содержимым
         }
+        CrossingStation(int number, int av_traffic, char* name){
+            fill(number, av_traffic, name);   // Заполняем поля нужным содержимым
+        }
         inline bool isCrossing() const override                 { return true; }
         std::vector<std::string> getCrossingStations() const    { return m_CrossList;           }
-        inline void addCrossingStation(const std::string name)  { m_CrossList.push_back(name);  }
+        inline void addCrossingStation(const std::string name) override { m_CrossList.push_back(name);  }
 
         void printFullInfo() const override {      // Вывод на печать всей информации о станции
             std::cout << "_________________________"        << std::endl <<
@@ -61,6 +63,4 @@ class CrossingStation : public Station {
         ~CrossingStation () override {}// Кажется, тут что-то должно быть по другому
 
 };
-
-
 #endif //RAILWAY_CROSSING_STATION_H

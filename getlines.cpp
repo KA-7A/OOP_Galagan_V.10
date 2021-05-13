@@ -109,18 +109,25 @@ std::vector<Line*> getLines(const char *filename, std::vector<Line *> Lines, int
              */
             if (St["is_crossing"].GetBool())  // Если у нас станция пересадочная
             {
-                CrossingStation *tmpStation;    // Кажется, вариант, мягко говоря, не самый оптимальный
-                tmpStation = new CrossingStation(tmpNum, St["traffic"].GetInt(), St["name"].GetString());
-
+                if (mode == LNKD_LIST) {
+                    Lines[i]->addStationToLine(new CrossingStation(tmpNum, St["traffic"].GetInt(), St["name"].GetString()));
+                }
+                else if (mode == SKIP_LIST)
+                {
+                    Lines[i]->addStationToLine(new S_CrossingStation(tmpNum, St["traffic"].GetInt(), St["name"].GetString()));
+                }
                 for (unsigned int k = 0; k < St["cross_to"].Size(); k++) // И запихиваем в неё все станции пересадки.
                 {
                     assert(St["cross_to"][k].IsString());
-                    tmpStation->addCrossingStation(St["cross_to"][k].GetString());
+                    Lines[i]->getEndStation()->addCrossingStation (St["cross_to"][k].GetString());
                 }
-                Lines[i]->addStationToLine(tmpStation);
+
             }
             else    // Иначе станция обычная, и с ней головной боли сильно меньше.
-                Lines[i]->addStationToLine(new Station(tmpNum, St["traffic"].GetInt(), St["name"].GetString()));
+                if (mode == LNKD_LIST)
+                    Lines[i]->addStationToLine(new Station(tmpNum, St["traffic"].GetInt(), St["name"].GetString()));
+                else if (mode == SKIP_LIST)
+                    Lines[i]->addStationToLine(new S_Station(tmpNum, St["traffic"].GetInt(), St["name"].GetString()));
         }
         Lines[i]->connectLine();     // Там происходит сортировка внутри вектора и связывание всех станций в ветку
     }

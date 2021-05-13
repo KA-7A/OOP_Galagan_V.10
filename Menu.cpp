@@ -30,44 +30,42 @@ int Menu::drawStations(int mode) const {
 }
 
 void Menu::printResult(int res) {
-    {
-        std::cout << "Test timetable test's result:";
-        switch (res) {
-            case 0: {
-                std::cout << " Ok! " << std::endl << std::endl;
-                break;
-            }
-            case -1: {
-                std::cout << " Error: Station(s) with such name(s) was(were) not found in line " << std::endl
-                          << std::endl;
-                break;
-            }
-            case -2: {
-                std::cout << " Error: Train reached the end of line but not the route!" << std::endl << std::endl;
-                break;
-            }
-            case -3: {
-                std::cout << " Error: Wrong time in timetable!" << std::endl << std::endl;
-                break;
-            }
-            case -4: {
-                std::cout << " Error: Timetable is empty!" << std::endl << std::endl;
-                break;
-            }
-            case -5: {
-                std::cout << " Error: Timetable has only one strip! " << std::endl << std::endl;
-                break;
-            }
-            case -6: {
-                std::cout
-                        << " Error: Train missed the station/ changed the direction/ try to reach the unknown station \n\n";
-                break;
-            }
-            default: {
-                std::cout << " Strange things... How did u got that?" << std::endl << std::endl;
-                break;
-            }
-        };
+    std::cout << "Test timetable test's result:";
+    switch (res) {
+        case 0: {
+            std::cout << " Ok! " << std::endl << std::endl;
+            break;
+        }
+        case -1: {
+            std::cout << " Error: Station(s) with such name(s) was(were) not found in line " << std::endl
+                      << std::endl;
+            break;
+        }
+        case -2: {
+            std::cout << " Error: Train reached the end of line but not the route!" << std::endl << std::endl;
+            break;
+        }
+        case -3: {
+            std::cout << " Error: Wrong time in timetable!" << std::endl << std::endl;
+            break;
+        }
+        case -4: {
+            std::cout << " Error: Timetable is empty!" << std::endl << std::endl;
+            break;
+        }
+        case -5: {
+            std::cout << " Error: Timetable has only one strip! " << std::endl << std::endl;
+            break;
+        }
+        case -6: {
+            std::cout
+                    << " Error: Train missed the station/ changed the direction/ try to reach the unknown station \n\n";
+            break;
+        }
+        default: {
+            std::cout << " Strange things... How did u got that?" << std::endl << std::endl;
+            break;
+        }
     }
 }
 

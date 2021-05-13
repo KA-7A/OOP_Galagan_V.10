@@ -40,9 +40,15 @@ public:
         m_next = nullptr;
         m_prev = nullptr;
     }
+    Station(int number, int av_traffic, char* name) {
+        m_number = number;
+        m_av_traffic = av_traffic;
+        m_name = name;
+        m_next = nullptr;
+        m_prev = nullptr;
+    }
 // #### Производим манипуляции с самой станцией #### //
     void fill(int number, int av_traffic, std::string name){    // Заполняем основные поля станции
-
         m_number = number;
         m_name = std::move(name);
         m_av_traffic = av_traffic;
@@ -50,10 +56,13 @@ public:
     // ## Соединяем станции ## //
     inline void rightConnect(Station *next, Span &right )  { m_next = next ; m_right = right; }
     inline void leftConnect (Station *prev, Span &left)    { m_prev = prev ; m_left  = left;  }
+    inline void rightConnect(Station *next)                { m_next = next; }
+    inline void leftConnect (Station *prev)                { m_next = prev; }
 
     // ## Меняем кое-какие показатели ## //
     inline void setTraffic   (int traffic)      { m_av_traffic = traffic;     }
     inline void setName      (std::string name) { m_name   = std::move(name); }
+    inline void setName      (char * name)      { m_name   = name;            }
     inline void setNumber    (int number)       { m_number = number;          }
 
     // ## Выдаем всю информацию о станции на печать ## //
@@ -100,7 +109,7 @@ public:
     bool operator== (const Station &S2) const { return (m_number == S2.m_number); }
     bool operator<  (const Station &S2) const { return (m_number <  S2.m_number); }
 
-
+    virtual void addCrossingStation(const std::string name) { return; }
     virtual int rightLayerConnect(int layer, Station *St, double minTime, double maxTime) { return 0; }
     virtual int leftLayerConnect (int layer, Station *St, double minTime, double maxTime) { return 0; }
     virtual int getSize() { return 0; }
@@ -118,29 +127,46 @@ private:
     std::vector<neighbour*> m_leftDir, m_rightDir;
     int m_size;
     static const int maxSize = 4;
-public:
-    S_Station()
+protected:
+    void init_size(int seed)
+    {
+        std::srand(std::time(nullptr)+seed);
+        double tmp = (std::rand() % 1000) / 1000.;
+        int i;
+        for (i = 1; i < maxSize; i++ )
+            if (tmp > 1. / pow(2, i) )
+            {
+                m_size = i;
+                return;
+            }
+    }
+    void init_size()
     {
         std::srand(std::time(nullptr));
         double tmp = (std::rand() % 1000) / 1000.;
         int i;
         for (i = 1; i < maxSize; i++ )
             if (tmp > 1. / pow(2, i) )
-                break;
-        std::cout << "tmp" << tmp << "; Size " << i << std::endl;
-        m_size = i;
+            {
+                m_size = i;
+                return;
+            }
+    }
+public:
+    S_Station()
+    {
+        init_size();
     }
     /*explicit (?) */  S_Station(int seed)
     {
+        init_size(seed);
+    }
+    S_Station(int number, int av_traffic, std::string name) {
+        fill(number, av_traffic, std::move(name));
+        init_size();
+        leftConnect(nullptr);
+        rightConnect(nullptr);
 
-        std::srand(std::time(nullptr)+seed);
-        double tmp = (std::rand() % 1000) / 1000.;
-        int i;
-        for (i = 1; i < maxSize; i++ )
-            if (tmp > 1. / pow(2, i) )
-                break;
-        std::cout << "tmp" << tmp << "; Size " << i << std::endl;
-        m_size = i;
     }
 
     int getSize() override { return m_size; }
@@ -166,6 +192,9 @@ public:
         m_rightDir.push_back(tmp);
         return 0;
     }
+
+    //virtual void addCrossingStation(const std::string name) override { return; }
+
     ~S_Station() override
     {
         for (auto & i : m_leftDir)
@@ -176,4 +205,59 @@ public:
     }
 
 };
+
+class S_CrossingStation: public S_Station
+{
+private:
+    std::vector<std::string> m_CrossList;
+public:
+    S_CrossingStation()   // Дефолтный конструктор
+    {
+        fill(0, 0, "Unnamed");
+    }
+    S_CrossingStation(int number, int av_traffic, std::string name){
+        fill(number, av_traffic, name);   // Заполняем поля нужным содержимым
+    }
+    inline bool isCrossing() const override                 { return true; }
+    std::vector<std::string> getS_CrossingStations() const  { return m_CrossList;           }
+    inline void addCrossingStation(const std::string name) override  { m_CrossList.push_back(name);  }
+
+    void printFullInfo() const override {      // Вывод на печать всей информации о станции
+        std::cout << "_________________________"        << std::endl <<
+                  "| name: "       << getName()      << std::endl <<
+                  "| num : "       << getNumber()    << std::endl <<
+                  "| av_traffic: " << getTraffic()   << std::endl <<
+                  "| Type: crossing"                 << std::endl <<
+                  "| neighbours: "                   << std::endl;
+        if (getLeftAddr() ) std::cout << "| l:" << getLeftName()  << std::endl;
+        if (getRightAddr()) std::cout << "| r:" << getRightName() << std::endl;
+        std::cout << "| | Cross to: " << std::endl;
+        for (unsigned int i = 0; i < m_CrossList.size(); i++)
+            std::cout << "| | "<< i << ". " << m_CrossList[i] <<";" << std::endl;
+        std::cout  << "|________________________"  << std::endl;
+    }
+
+// ## Вообще не факт, что это когда-либо пригодится, но пусть будет (ничего не тестил, не факт что вообще работает)
+    void rmCrossingStationByName    (const std::string& name) {
+        for (long unsigned int i = 0; i != m_CrossList.size(); ++i)  // Trying to find the station in m_CrossList
+            if (m_CrossList[i] == name)
+            {
+                m_CrossList.erase(m_CrossList.begin() + i);   // And erase it
+                return;
+            }
+        std::cout << "No station with this name was found!" << std::endl;
+    }
+    void rmCrossingStationByPosition(int pos) { m_CrossList.erase(m_CrossList.begin() + pos); }
+    inline void rmAllCrossingStations()       { m_CrossList.clear(); }
+    void printCrossStations() const {
+        std::cout << "Cross to: \n";
+        for (long unsigned int i = 0; i < m_CrossList.size(); std::cout << "--\"" << m_CrossList[i] << "\"" << std::endl, i++);
+        std::cout << "-------------------" << std::endl;
+    }
+
+    ~S_CrossingStation () override {}// Кажется, тут что-то должно быть по другому
+
+
+};
+
 #endif //RAILWAY_STATION_H
