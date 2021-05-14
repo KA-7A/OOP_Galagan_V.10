@@ -1,0 +1,2 @@
+railway_system: *.h main.cpp line.cpp Menu.cpp timetable.cpp railway_system.cpp extern.cpp
+	g++ -fPIC -shared -g -O0 -o ./lib/libmain.so main.cpp line.cpp Menu.cpp timetable.cpp railway_system.cpp extern.cpp

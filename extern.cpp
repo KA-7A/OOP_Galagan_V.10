@@ -37,6 +37,11 @@ extern "C"
     void e_Sp_setTime_max (Span *Sp, double time) { Sp->setTime_max(time); }
     void e_Sp_setTime_min (Span *Sp, double time) { Sp->setTime_min(time); }
 
+    // ## Menu ## //
+    char * e_drawMainMenu(){
+
+    }
+
     // ## RAILWAY_SYSTEM ## //
     railway_system* e_RS_init(char *filename, int mode)
     {
@@ -44,6 +49,6 @@ extern "C"
         RS->lineInit(filename, mode);
         return RS;
     }
-    void e_RS_finish(railway_system *RS) {    delete RS; }
+    void e_RS_finish(railway_system *RS) { delete RS; }
 
 }

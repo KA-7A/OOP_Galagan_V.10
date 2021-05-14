@@ -3,13 +3,16 @@
 //
 
 #include "railway_system.h"
+#define NO_SUCH_FILE -1
+#define NOT_A_JSON -2
+#define INCORRECT_CONTENT -3
 
 
-void railway_system::lineInit(const char *filename, int mode) {
+int railway_system::lineInit(const char *filename, int mode) {
     // -- Тут идет блок с открытием файла и парсингом его в объект, с которым дальше нужно будет работать -- //
 //--- Parsing from file to object ---//
     FILE *source = fopen(filename, "r");
-    assert(source);
+    if (!source) return NO_SUCH_FILE;
     char readBuffer[65536];
     FileReadStream is(source, readBuffer, sizeof(readBuffer));
 
@@ -22,23 +25,28 @@ void railway_system::lineInit(const char *filename, int mode) {
     // -- Закрыли файл, теперь у нас есть объект linesObj, в котором, по идее, должен лежать корректный набор данных -- //
     // -- Дальше нужно заполнить список
     // -- Но сначала сделаем пару проверок
-    assert(linesObj.IsObject());        // Проверяем, что то, что у нас есть -- это корректный JSON
-    assert(linesObj.HasMember("lines") &&
-           linesObj["lines"].Size()); // В котором есть непустой элемент lines (в нем названия линий)
+    if (!linesObj.IsObject()) return NOT_A_JSON;        // Проверяем, что то, что у нас есть -- это корректный JSON
+    if (!(linesObj.HasMember("lines") &&
+          linesObj["lines"].Size()))
+    {
+        std::cout << "wtf";
+        return INCORRECT_CONTENT ; // В котором есть непустой элемент lines (в нем названия линий)
+    }
+
 
     for (unsigned int i = 0; i < linesObj["lines"].Size(); i++)       // Идем по линиям
     {
-        assert(linesObj["lines"][i].IsString());    // Проверили, строка ли тут у нас
+        if (!linesObj["lines"][i].IsString()) return INCORRECT_CONTENT;    // Проверили, строка ли тут у нас
         std::string lineName = linesObj["lines"][i].GetString();
 
-        assert(linesObj.HasMember(lineName.c_str())); // Проверяем, что у нас есть такой блок
-        assert(linesObj[linesObj["lines"][i]].HasMember("stations") && linesObj[linesObj["lines"][i]].HasMember(
-                "spans"));    // Проверяем, что в нашем блоке-линии есть необходимые элементы
+        if (! linesObj.HasMember(lineName.c_str())) return INCORRECT_CONTENT; // Проверяем, что у нас есть такой блок
+        if (!(linesObj[linesObj["lines"][i]].HasMember("stations") && linesObj[linesObj["lines"][i]].HasMember(
+                "spans"))) return INCORRECT_CONTENT;    // Проверяем, что в нашем блоке-линии есть необходимые элементы
         // Вот это потенциально сложный для осознания момент:
         const Value &line = linesObj[linesObj["lines"][i]]["stations"];    // Делаем объект, состоящий из станций
         const Value &spans = linesObj[linesObj["lines"][i]]["spans"];       // Делаем объект, состоящий из перегонов
         // std::cout << "line.Size = " << line.Size() << "; spans.Size - 1 = " << spans.Size() - 1 << std::endl;
-        assert(line.Size() == (spans.Size() - 1));    // Проверяем, что перегонов на 1 больше, чем станци//
+        if (line.Size() != (spans.Size() - 1)) return INCORRECT_CONTENT;    // Проверяем, что перегонов на 1 больше, чем станци//
         // (2 мнимых перегона с нулевым временем по краям ветки)
         /*      Запутанное объяснение, можно не читать)
          * Суть в том, что у нас есть JSON следующего вида:
@@ -62,7 +70,7 @@ void railway_system::lineInit(const char *filename, int mode) {
         for (unsigned int j = 0; j < spans.Size(); j++)  // Тут мы заполнили вектор из
         {
             const Value &Sp = spans[j];
-            assert(Sp.IsObject()                                  // Проверяем, что это у нас объект
+            if (!(Sp.IsObject()                                  // Проверяем, что это у нас объект
                    && Sp.HasMember("left") && Sp["left"].IsString()     // Что в нем есть строковое поле "left"
                    && Sp.HasMember("right") && Sp["right"].IsString()    // Что в нём есть строковое поле "right"
                    // Что там есть поле время с неотрицательным значением
@@ -70,7 +78,7 @@ void railway_system::lineInit(const char *filename, int mode) {
                    Sp["min_time"].GetDouble() >= 0
                    && Sp.HasMember("max_time") && (Sp["max_time"].IsDouble() || Sp["max_time"].IsInt()) &&
                    Sp["max_time"].GetDouble() >= 0
-            );
+            )) return INCORRECT_CONTENT;
             Span tmpSpan(Sp["left"].GetString(), Sp["right"].GetString(), Sp["min_time"].GetDouble(),
                          Sp["max_time"].GetDouble());
             m_Lines[i]->spanPushBack(tmpSpan);
@@ -85,7 +93,7 @@ void railway_system::lineInit(const char *filename, int mode) {
             // Document st = linesObj[lineName.c_str()][j];
             // Проверяем, что объект, который мы тут читаем, вообще подходит под формат станции (под нужный нам формат)
             // Защищаемся вообще от всего. Вот вообще.
-            assert (St.IsObject()
+            if (!(St.IsObject()
                     && St.HasMember("name") &&
                     St["name"].IsString()                                        // Проверяем, что у нас есть имя, и что это строка
                     && St.HasMember("number") && St["number"].IsInt() &&
@@ -102,7 +110,7 @@ void railway_system::lineInit(const char *filename, int mode) {
                             !St["cross_to"].Size())) // Если непересадочная, то кол-во пересадок ноль
                     && St.HasMember("traffic") && St["traffic"].IsInt() &&
                     St["traffic"].GetInt() >= 0  // Проверяем инфу о траффике
-            );
+            )) return INCORRECT_CONTENT;
             // Station(int number, int av_traffic, std::string name)
             int tmpNum = St["number"].GetInt();
             if (tmpNum < 1000) tmpNum += 1000 * (i + 1);
@@ -123,7 +131,7 @@ void railway_system::lineInit(const char *filename, int mode) {
                 for (unsigned int k = 0;
                      k < St["cross_to"].Size(); k++) // И запихиваем в неё все станции пересадки.
                 {
-                    assert(St["cross_to"][k].IsString());
+                    if (!St["cross_to"][k].IsString()) return INCORRECT_CONTENT;
                     m_Lines[i]->getEndStation()->addCrossingStation(St["cross_to"][k].GetString());
                 }
 
@@ -135,5 +143,6 @@ void railway_system::lineInit(const char *filename, int mode) {
         }
         m_Lines[i]->connectLine();     // Там происходит сортировка внутри вектора и связывание всех станций в ветку
     }
+    return 0;
 }
 

@@ -16,7 +16,7 @@ class railway_system {
 private:
     std::vector<Line*> m_Lines;
 public:
-    void lineInit(const char *filename, int mode) ;
+    int lineInit(const char *filename, int mode) ;
     std::vector<Line*> getLines() { return m_Lines; }
     ~railway_system() { for (int i = 0; i < m_Lines.size(); delete m_Lines[i], i++); }
 };
