@@ -14,6 +14,8 @@
 #include <cmath>
 #include <utility>
 #include <iostream>
+#include <cstdlib>
+#include <cstring>
 #include "span.h"
 
 class Span;
@@ -77,10 +79,51 @@ public:
         if (getRightAddr()) std::cout << "| r:" << getRightName() << std::endl;
         std::cout  << "|________________________"  << std::endl;
     }
-    void printShortInfo()         const {
+
+    virtual int get_FullInfo(char * c_msg, int size)  const {
+        std::string msg;
+        msg =  "_________________________";
+        msg += "\n| name: "         + m_name        +
+               "\n| num : "         + std::to_string(m_number)      +
+               "\n| av_traffic: "   + std::to_string(m_av_traffic)  +
+               "\n| Type: regular"                  +
+               "\n| neighbours: "                   ;
+        if (getLeftAddr() ) msg+=  "\n| l:" + getLeftName()  ;
+        if (getRightAddr()) msg+=  "\n| r:" + getRightName() ;
+        msg+=  + "\n|________________________\n";
+//        std::cout << msg;
+        if (msg.size() + 1 > size)
+        {
+            // std::cout << "smth_ has gone wrong\n";
+            strcpy(c_msg, "\0");
+            return -1;
+        }
+        else {
+            strncpy(c_msg, msg.c_str(), msg.size() + 1);
+//            std::cout << "Ok";
+            return 0;
+        }
+    }
+    virtual void printShortInfo()         const {
         std::cout << "|---------------------------" << std::endl;
         std::cout << "| name: " << m_name   << std::endl <<
                      "| num : " << m_number << std::endl;
+    }
+    int get_ShortInfo(char * c_msg, int size)         const {
+        std::string msg;
+        msg  = "|---------------------------\n";
+        msg += "| name: " + m_name +
+             "\n| num : " + std::to_string(m_number) + "\n";
+        // std::cout << msg;
+        if (msg.size() + 1 > size)
+        {
+            strcpy(c_msg, "\0");
+            return -1;
+        }
+        else {
+            strncpy(c_msg, msg.c_str(), msg.size() + 1);
+            return 0;
+        }
     }
 
 // #### Получаем информацию о самой станции #### //
@@ -117,6 +160,8 @@ public:
     virtual ~Station()= default;
 };
 
+
+// ## Структура для скип-листа ## //
 typedef struct neighbour {
     Station *St;
     double minTime, maxTime;
@@ -237,7 +282,7 @@ public:
         std::cout  << "|________________________"  << std::endl;
     }
 
-// ## Вообще не факт, что это когда-либо пригодится, но пусть будет (ничего не тестил, не факт что вообще работает)
+    // ## Вообще не факт, что это когда-либо пригодится, но пусть будет (ничего не тестил, не факт что вообще работает)
     void rmCrossingStationByName    (const std::string& name) {
         for (long unsigned int i = 0; i != m_CrossList.size(); ++i)  // Trying to find the station in m_CrossList
             if (m_CrossList[i] == name)

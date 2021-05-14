@@ -15,6 +15,7 @@
 #define RAILWAY_LINE_H
 #include <utility>
 #include <vector>
+#include <string>
 #include <list>
 #include <cassert>
 
@@ -29,6 +30,8 @@
 
 #include <cstdio>
 #include <algorithm>
+
+#define SIZE 4096
 
 using namespace rapidjson;
 
@@ -49,9 +52,7 @@ private:
     }
 
 public:
-    Line() {
-        m_head = m_tail = nullptr;
-    }
+    Line() { m_head = m_tail = nullptr; }
 
 // ## Надо будет поменять названия, потому что они слегка не соответствуют тому, что должны делать ## //
      inline void addStationToLine(Station* S){
@@ -74,7 +75,7 @@ public:
             head ->printFullInfo();
             head = head->getRightAddr();
         }
-        head ->printFullInfo();
+        head->printFullInfo();
     }
     void printShortAllStationsInfo_list() const{
         Station *head = m_head;
@@ -85,9 +86,54 @@ public:
         }
         head->printShortInfo();
     }
+
+    int get_ShortAllStationsInfo_list(char * c_msg, int size) const{
+        std::string msg = "";
+        Station *head = m_head;
+        while (head != m_tail) {
+            char tmp_msg[SIZE];
+            if (!head->get_ShortInfo(tmp_msg, SIZE))
+                msg += tmp_msg;
+            else
+                return -1;
+            head = head->getRightAddr();
+        }
+        char tmp_msg [SIZE];
+//        std::cout << msg;
+        if(!head ->get_ShortInfo(tmp_msg, SIZE))
+        {
+            msg += tmp_msg;
+            strncpy(c_msg, msg.c_str(), msg.size());
+            return 0;
+        }
+        else {
+            return -1;
+        }
+    }
+    int get_FullAllStationsInfo_list (char * c_msg, int size) const{
+        std::string msg = "";
+        Station *head = m_head;
+        while (head != m_tail)
+        {
+            char tmp_msg [SIZE];
+            if(!head ->get_FullInfo(tmp_msg, SIZE))
+                msg += tmp_msg;
+            else
+                return -1;
+            head = head->getRightAddr();
+        }
+        char tmp_msg [SIZE];
+        if(!head ->get_FullInfo(tmp_msg, SIZE)){
+            msg += tmp_msg;
+            strncpy(c_msg, msg.c_str(), msg.size());
+            return 0;
+        }
+        else
+            return -1;
+    }
 // ## Получаем на выход информацию о станции
-    std::string getName() const   { return m_name;          }
-    Station * getEndStation()     { return *m_line.rbegin();   }
+    std::string getName() const   { return m_name;           }
+    Station * getEndStation()     { return *m_line.rbegin(); }
 // ## Метод связывания вектора в связный список
     virtual void connectLine();
 

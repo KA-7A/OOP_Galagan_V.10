@@ -42,6 +42,22 @@ class CrossingStation : public Station {
             std::cout  << "|________________________"  << std::endl;
         }
 
+        int get_FullInfo(char * c_msg, int size) {
+        std::string msg;
+        msg =  "_________________________";
+        msg += "\n| name: "         + getName()        +
+               "\n| num : "         + std::to_string(getNumber())      +
+               "\n| av_traffic: "   + std::to_string(getTraffic())  +
+               "\n| Type: crossing" +
+               "\n| neighbours: "                   ;
+        if (getLeftAddr() ) msg+=  "\n| l:" + getLeftName()  ;
+        if (getRightAddr()) msg+=  "\n| r:" + getRightName() ;
+        msg+=  + "\n|________________________\n";
+//        std::cout << msg;
+        if (msg.size() + 1 > size) strcpy(c_msg, "\0");
+        else
+            strncpy(c_msg, msg.c_str(), msg.size()+1);
+    }
 // ## Вообще не факт, что это когда-либо пригодится, но пусть будет (ничего не тестил, не факт что вообще работает)
         void rmCrossingStationByName    (const std::string& name) {
             for (long unsigned int i = 0; i != m_CrossList.size(); ++i)  // Trying to find the station in m_CrossList

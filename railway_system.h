@@ -18,7 +18,13 @@ private:
 public:
     int lineInit(const char *filename, int mode) ;
     std::vector<Line*> getLines() { return m_Lines; }
+    int get_Amount_of_lines() { return m_Lines.size(); }
+    Line* get_line(int num) {
+        if (num < m_Lines.size()) return m_Lines[num];
+        else return nullptr;
+    }
     ~railway_system() { for (int i = 0; i < m_Lines.size(); delete m_Lines[i], i++); }
+
 };
 
 
