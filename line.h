@@ -55,7 +55,7 @@ public:
     Line() { m_head = m_tail = nullptr; }
 
 // ## Надо будет поменять названия, потому что они слегка не соответствуют тому, что должны делать ## //
-     inline void addStationToLine(Station* S){
+    inline void addStationToLine(Station* S){
         // Надо сделать так, что при вставке нового элемента, список был всегда отсортирован
         auto pos = std::find_if(m_line.begin(), m_line.end(),
                                [&]( Station *it) { return (it->getNumber() > S->getNumber()); }) ;
@@ -65,7 +65,8 @@ public:
     }
 
 // ## Меняем кое-что внутри нашей ветки
-    inline void writeName(std::string name) { m_name = std::move(name); }
+    inline void setName  (std::string name) { m_name = std::move(name); }
+    inline void setName  (const char* name) { m_name = name;            }
     inline void spanPushBack(const Span& s) { m_spansList.push_back(s); }
 
     void printFullAllStationsInfo_list()  const{

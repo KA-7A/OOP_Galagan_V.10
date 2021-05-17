@@ -50,7 +50,7 @@ double Line::calculateTravelTime_min(int n1, int n2) const {
                                  { return (curStation->getNumber() == n1 or curStation->getNumber() == n2);});
     if (startPos == m_line.end())
     {
-        std::cout << "Station with that number did not found!" << std::endl;
+//        std::cout << "Station with that number did not found!" << std::endl;
         return -1;
     }
     /*
@@ -71,7 +71,7 @@ double Line::calculateTravelTime_min(int n1, int n2) const {
         }
         if (endPos == m_line.end())
         {
-            std::cout << "Station with that number did not found!" << std::endl;
+//            std::cout << "Station with that number did not found!" << std::endl;
             return -1;
         }
         /*
@@ -94,7 +94,7 @@ double Line::calculateTravelTime_min(int n1, int n2) const {
         }
         if (endPos == m_line.end())
         {
-            std::cout << "Station with that number did not found!" << std::endl;
+//            std::cout << "Station with that number did not found!" << std::endl;
             return -1;
         }/*
         tail = head;
@@ -137,7 +137,7 @@ double Line::calculateTravelTime_max(int n1, int n2) const {
         }
         if (endPos == m_line.end())
         {
-            std::cout << "Station with that number did not found!" << std::endl;
+//            std::cout << "Station with that number did not found!" << std::endl;
             return -1;
         }
         /*
@@ -160,7 +160,7 @@ double Line::calculateTravelTime_max(int n1, int n2) const {
         }
         if (endPos == m_line.end())
         {
-            std::cout << "Station with that number did not found!" << std::endl;
+//            std::cout << "Station with that number did not found!" << std::endl;
             return -1;
         }/*
         tail = head;

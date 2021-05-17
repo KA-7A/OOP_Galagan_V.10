@@ -20,7 +20,7 @@ int main() {
 
 extern "C"
 {
-    railway_system * e_init(char *filename, int mode, char *error_msg) {
+    railway_system * e_init (char *filename, int mode, char *error_msg) {
         auto *RS  = new railway_system;
         int error = RS->lineInit(filename, mode);
         //char error_msg[100];
@@ -54,10 +54,19 @@ extern "C"
         return RS;
     }
 
-    void e_cpp_consoleMenu( railway_system *RS) { Menu(RS->getLines()); }
-    void e_finish (railway_system *RS) { delete RS; }
-    int e_get_AmountOfLines(railway_system *RS) { return RS->get_Amount_of_lines(); }
-    int e_get_linename(railway_system *RS, int number, char *msg, int size)
+    double e_calculate_time_min(railway_system *RS, int lineNum, int st_num_1, int st_num_2)
+    {
+        return RS->get_line(lineNum)->calculateTravelTime_min(st_num_1, st_num_2);
+    }
+    double e_calculate_time_max(railway_system *RS, int lineNum, int st_num_1, int st_num_2)
+    {
+        return RS->get_line(lineNum)->calculateTravelTime_max(st_num_1, st_num_2);
+    }
+
+    void e_cpp_consoleMenu  (railway_system *RS) { Menu(RS->getLines()); }
+    void e_finish           (railway_system *RS) { delete RS; }
+    int e_get_AmountOfLines (railway_system *RS) { return RS->get_Amount_of_lines(); }
+    int e_get_linename      (railway_system *RS, int number, char *msg, int size)
     {
         std::string s = RS->get_line(number)->getName();
         //std::cout << s;
@@ -66,20 +75,23 @@ extern "C"
             strcpy(msg, "\0");
             return -1;
         }
-        else
-            strncpy(msg, s.c_str(), s.size());
+        strncpy(msg, s.c_str(), s.size());
         return 0;
     }
-    Line* e_get_line(railway_system *RS, int number)
+
+    void e_set_linename     (Line *line, const char * new_name ) { line->setName(new_name); }
+
+
+    Line* e_get_line        (railway_system *RS, int number)
     {
         return RS->get_line(number);
     }
     // Вывод всей линии (короткая и полная инфа соответственно)
-    int e_get_ShortInfo(Line *line, char *msg, int size)
+    int e_get_ShortInfo     (Line *line, char *msg, int size)
     {
         return line->get_ShortAllStationsInfo_list(msg, size);
     }
-    int e_get_FullInfo(Line *line, char *msg, int size)
+    int e_get_FullInfo      (Line *line, char *msg, int size)
     {
         return line->get_FullAllStationsInfo_list(msg, size);
     }

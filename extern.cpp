@@ -20,7 +20,15 @@ extern "C"
     inline int e_St_getTraffic     (Station *St) { return St->getTraffic();        }
     inline int e_St_isCrossing     (Station *St) { return St->isCrossing();}
     // ## Изменение информации о станции ## //
-    inline void e_St_setNumber  (Station *St, int number)  { St->setNumber(number);    }
+    inline int  e_St_setNumber  (Line * line, Station *St, int number)  {
+        if(line->isNumFree(number))
+        {
+            St->setNumber(number);
+            return 0;
+        }
+        else
+            return 1;
+    }
     inline void e_St_setTraffic (Station *St, int traffic) { St->setTraffic(traffic);  }
     inline void e_St_setName    (Station *St, char * name) { St->setName(name);        }
     // ## Печать информации в терминал (бесполезно для GUI) ## //
