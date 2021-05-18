@@ -98,52 +98,29 @@ class RailwaySystem(object):
                         if admin_station_choice == 0:
                             continue
                         elif admin_station_choice == 1:
-                            self.printLineNames(RS)
-                            admin_line_choice = self.getChoice()
-                            res, msg = self.printShortInfo(RS, admin_line_choice)
-                            if not res:
-                                self.strangePrint(msg)
-                            else:
-                                print("Error: printLineNames: line was not found")
-                                continue
-                            old_number = self.getChoice("Enter station number")
+                            station, station_number = self.getStation(RS)
+
                             new_number = self.getChoice("Enter new station number")
                             line = lib_railway.e_get_line(RS, admin_line_choice)
                             print("Ok1")
-                            station = lib_railway.e_get_St_byNumber(line, old_number)
+                            station = lib_railway.e_get_St_byNumber(line, station_number)
                             print("Ok2")
                             res = lib_railway.e_set_St_Number(station, new_number)
                             if res:
                                 print("Error: e_set_St_Number: station was not found or number is already occuped")
                         elif admin_station_choice == 2:
-                            self.printLineNames(RS)
-                            admin_line_choice = self.getChoice()
-                            res, msg = self.printShortInfo(RS, admin_line_choice)
-                            if not res:
-                                self.strangePrint(msg)
-                            else:
-                                print("Error: printLineNames: line was not found")
-                                continue
-                            station_num = self.getChoice("Enter station number ")
-                            line = lib_railway.e_get_line(RS, admin_line_choice)
-                            station = lib_railway.e_get_St_byNumber(line, station_num)
-                            res = lib_railway.e_set_St_Name(station, input("Enter new name >> ").encode('utf-8'))
-                            if res: print("Error: Station is empty")
+                            station, station_number = self.getStation(RS)
+                            if station:
+                                res = lib_railway.e_set_St_Name(station, input("Enter new name >> ").encode('utf-8'))
+                                if res: print("Error: Station is empty")
+                            else: print("Error: getStation()")
                         elif admin_station_choice == 3:
-                            self.printLineNames(RS)
-                            admin_line_choice = self.getChoice()
-                            res, msg = self.printShortInfo(RS, admin_line_choice)
-                            if not res:
-                                self.strangePrint(msg)
-                            else:
-                                print("Error: printLineNames: line was not found")
-                                continue
-                            station_num = self.getChoice("Enter station number ")
-                            line = lib_railway.e_get_line(RS, admin_line_choice)
-                            station = lib_railway.e_get_St_byNumber(line, station_num)
-                            traffic = self.getChoice("Enter new traffic >> ")
-                            res = lib_railway.e_set_St_Traffic(station, traffic)
-                            if res: print("Error: ??")
+                            station, station_number = self.getStation(RS)
+                            if station:
+                                traffic = self.getChoice("Enter new traffic >> ")
+                                res = lib_railway.e_set_St_Traffic(station, traffic)
+                                if res: print("Error: e_set_St_Traffic: ")
+                            else: print("Error: getStation")
                         elif admin_station_choice == 4 or admin_station_choice == 5:
                             print("*************************************************************************************\n"
                                   "* Мне было лень выполнять эту часть. Чуть выше по коду можно заметить, что тут куча *\n"
@@ -237,6 +214,18 @@ class RailwaySystem(object):
             lineNames.append(msg.value)
         return lineNames
 
+    def getStation(self, RS):
+        self.printLineNames(RS)
+        admin_line_choice = self.getChoice()
+        res, msg = self.printShortInfo(RS, admin_line_choice)
+        if not res:
+            self.strangePrint(msg)
+        else:
+            print("Error: printLineNames: line was not found")
+            return 0
+        station_num = self.getChoice("Enter station number ")
+        line = lib_railway.e_get_line(RS, admin_line_choice)
+        return lib_railway.e_get_St_byNumber(line, station_num), station_num
 
 if __name__ == '__main__':
     filename = './Saves/State.json'
