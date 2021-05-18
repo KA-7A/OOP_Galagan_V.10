@@ -80,7 +80,7 @@ public:
         std::cout  << "|________________________"  << std::endl;
     }
 
-    virtual int get_FullInfo(char * c_msg, int size)  const {
+    virtual int  get_FullInfo (char * c_msg, int size)  const {
         std::string msg;
         msg =  "_________________________";
         msg += "\n| name: "         + m_name        +
@@ -104,16 +104,11 @@ public:
             return 0;
         }
     }
-    virtual void printShortInfo()         const {
-        std::cout << "|---------------------------" << std::endl;
-        std::cout << "| name: " << m_name   << std::endl <<
-                     "| num : " << m_number << std::endl;
-    }
-    int get_ShortInfo(char * c_msg, int size)         const {
+    int          get_ShortInfo(char * c_msg, int size)  const {
         std::string msg;
         msg  = "|---------------------------\n";
         msg += "| name: " + m_name +
-             "\n| num : " + std::to_string(m_number) + "\n";
+               "\n| num : " + std::to_string(m_number) + "\n";
         // std::cout << msg;
         if (msg.size() + 1 > size)
         {
@@ -125,13 +120,30 @@ public:
             return 0;
         }
     }
+    virtual void printShortInfo()         const {
+        std::cout << "|---------------------------" << std::endl;
+        std::cout << "| name: " << m_name   << std::endl <<
+                     "| num : " << m_number << std::endl;
+    }
 
 // #### Получаем информацию о самой станции #### //
     inline int getNumber()              const { return m_number;       }
     inline int getTraffic()             const { return m_av_traffic;   }
     inline const std::string& getName() const { return m_name;         }
     inline virtual bool isCrossing()    const { return false;          }
-
+    bool isNumFree(int number)
+    {
+        auto start = this;
+        while(nullptr!= start->m_prev && nullptr != start->getLeftAddr() && start != start->getLeftAddr())
+            start = start->getLeftAddr();
+        int count = 0;
+        while (nullptr!= start->m_next&& nullptr != start->getRightAddr() && start != start->getRightAddr())
+        {
+            if (start->getNumber() == number) return false;
+            start = start->getRightAddr();
+        }
+        return true;
+    }
 // #### Получаем информацию о соседях станции ### //
     inline const std::string getLeftName()   const { if (m_prev!= nullptr) return m_prev->getName(); else return nullptr; }
     inline const std::string getRightName()  const { if (m_next!= nullptr) return m_next->getName(); else return nullptr; }
@@ -153,9 +165,9 @@ public:
     bool operator<  (const Station &S2) const { return (m_number <  S2.m_number); }
 
     virtual void addCrossingStation(const std::string name) { return; }
-    virtual int rightLayerConnect(int layer, Station *St, double minTime, double maxTime) { return 0; }
-    virtual int leftLayerConnect (int layer, Station *St, double minTime, double maxTime) { return 0; }
-    virtual int getSize() { return 0; }
+    virtual int  rightLayerConnect(int layer, Station *St, double minTime, double maxTime) { return 0; }
+    virtual int  leftLayerConnect (int layer, Station *St, double minTime, double maxTime) { return 0; }
+    virtual int  getSize() { return 0; }
 
     virtual ~Station()= default;
 };

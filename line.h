@@ -88,6 +88,16 @@ public:
         head->printShortInfo();
     }
 
+    bool isNumFree(int number)
+    {
+        for (auto i = m_line.begin(); i != m_line.end(); i++)
+        {
+            if ((*i)->getNumber() == number)
+                return false;
+        }
+        return true;
+    }
+
     int get_ShortAllStationsInfo_list(char * c_msg, int size) const{
         std::string msg = "";
         Station *head = m_head;
@@ -146,6 +156,15 @@ public:
     {
         for (Station *cur = m_head; cur != nullptr; cur = cur ->getRightAddr())
             if (cur->getName() == name) return cur;
+        return nullptr;
+    }
+    Station* findStationByNumber(int number)
+    {
+        for (auto  i = m_line.begin(); i != m_line.end(); i++)
+        {
+            if ((*i)->getNumber() == number)
+                return *i;
+        }
         return nullptr;
     }
 

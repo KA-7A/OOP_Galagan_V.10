@@ -86,7 +86,7 @@ int railway_system::lineInit(const char *filename, int mode) {
 // ---------- Here is m_Lines filling and connection block -- //
         // -- Вот до этого момента мы загнали линию в отдельный объект. -- //
 
-        m_Lines[i]->writeName(lineName);    // Сохранили название ветки
+        m_Lines[i]->setName(lineName);    // Сохранили название ветки
         for (unsigned int j = 0; j < line.Size(); j++) {     // Идем по станциям в этой линии
 
             const Value &St = line[j];
